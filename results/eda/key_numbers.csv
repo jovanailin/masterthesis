@@ -1,0 +1,14 @@
+,value
+Item-store series,"30,490"
+Training days,"1,913"
+"Zero cells, raw matrix",68.2%
+Zero cells that are pre-introduction,31.1%
+Median zero share (active period),63.3%
+Series with >50% zero days,67.2%
+Intermittent or lumpy series,90.8%
+Smooth series,6.3%
+"ACF lag 7, total",0.76
+"ACF lag 7, item median",0.08
+Revenue share of top 20% series,65.1%
+Series with zero revenue in last 28 days,5.2%
+Series with a zero run of 91+ days,48.4%

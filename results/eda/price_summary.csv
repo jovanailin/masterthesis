@@ -1,0 +1,4 @@
+cat_id,median_price,share_with_price_change,median_distinct_prices,median_max_over_min
+FOODS,2.74,0.7962421711899791,3.0,1.135135
+HOBBIES,3.97,0.6656637168141593,2.0,1.0588236
+HOUSEHOLD,4.92,0.6605539637058262,2.0,1.0468384

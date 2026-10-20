@@ -1,0 +1,19 @@
+# Data: the Kaggle competition rules do not allow redistribution.
+# Download instructions are in README.md.
+data/
+
+# Credentials
+kaggle.json
+access_token
+
+# Python / Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/

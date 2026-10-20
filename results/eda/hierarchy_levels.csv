@@ -1,0 +1,13 @@
+level,aggregation,n_series
+1,Total,1
+2,State,3
+3,Store,10
+4,Category,3
+5,Department,7
+6,State × Category,9
+7,State × Department,21
+8,Store × Category,30
+9,Store × Department,70
+10,Item,3049
+11,Item × State,9147
+12,Item × Store,30490

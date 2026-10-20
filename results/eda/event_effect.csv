@@ -1,0 +1,31 @@
+event,type,effect,occurrences
+Christmas,National,-0.9994888701629419,5
+Thanksgiving,National,-0.2847961757064937,5
+NewYear,National,-0.23293684718053634,5
+Easter,Cultural,-0.11829654852262947,5
+Father's day,Cultural,-0.11085861341229533,4
+Mother's day,Cultural,-0.10712442764779614,5
+Halloween,Cultural,-0.09127570320707741,5
+ValentinesDay,Cultural,-0.04146702532806451,6
+Eid al-Fitr,Religious,-0.029988499116181466,5
+Pesach End,Religious,-0.026397944086313862,5
+MemorialDay,National,-0.024589132547155713,5
+StPatricksDay,Cultural,-0.021865695437150317,6
+NBAFinalsEnd,Sporting,-0.019439951899087628,5
+Purim End,Religious,-0.0085323075999341,6
+IndependenceDay,National,-0.003711549483025811,5
+Ramadan starts,Religious,-0.0033658683020003854,5
+SuperBowl,Sporting,0.0006746469845991995,6
+OrthodoxChristmas,Religious,0.0075595005871544,5
+LentWeek2,Religious,0.008267358004683811,6
+EidAlAdha,Religious,0.012333787339525304,5
+OrthodoxEaster,Religious,0.01678959952656267,4
+MartinLutherKingDay,National,0.026636112824622638,5
+PresidentsDay,National,0.05089221036055117,6
+Chanukah End,Religious,0.051305918164699,5
+LentStart,Religious,0.054660182923453315,6
+NBAFinalsStart,Sporting,0.06212752260060561,5
+Cinco De Mayo,Cultural,0.07522641164025051,4
+ColumbusDay,National,0.09012303195608004,5
+VeteransDay,National,0.10163062497485242,5
+LaborDay,National,0.2776292008841048,5

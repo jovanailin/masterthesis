@@ -1,0 +1,173 @@
+PREDLOZI ZA DOPRINOS RADA (notebook 03)
+=======================================
+
+Status: predlog za razgovor sa mentorom. Ništa od ovoga još nije implementirano.
+Datum: 2026-11-03
+
+
+1. POLAZNA TAČKA
+----------------
+
+Notebook 02 replicira rad Tsantilis, Giannopoulos, Dasaklis & Patsakis (IEEE 2025),
+"Evaluating cross-series pooling protocols in intermittent demand forecasting: A factorial study".
+
+Njihov dizajn: 3 x 2 faktorijal (LightGBM / LSTM / ESN  x  model po seriji / globalni model),
+100 stratifikovanih intermitentnih M5 serija, direktna prognoza 28 dana, metrika RMSSE@28,
+Wilcoxon-Holm i Friedman-Nemenyi testovi.
+
+Ulaz su ISKLJUČIVO sirove lag vrednosti prodaje (količine). Namerno su isključili kalendar,
+dan u nedelji, pokretne statistike, vreme od poslednje prodaje, identifikator serije i sve
+egzogene promenljive (odeljak IV.B rada). Svaka serija se skalira MinMax-om na [0, 1].
+
+Njihov zaključak: globalno treniranje služi kao ZAMENA za obeležja ("pooling as a feature
+substitute"). Pomaže LightGBM-u i ESN-u, a ne pomaže LSTM-u.
+
+
+2. DOPRINOS SA SAMIM LAG VREDNOSTIMA
+------------------------------------
+
+Autori su osim ulaza držali fiksnim i mnogo drugih stvari, i sami ih navode kao ograničenja.
+Svaka od njih može postati faktor u proširenju, uz isti ulaz (samo lag vrednosti).
+
+  Šta su držali fiksnim               Proširenje                                        Odeljak
+  ----------------------------------  ------------------------------------------------  -------
+  Nema klasičnih benchmark metoda     Croston, SBA, TSB, ADIDA, naivni, sezonski naivni  7.1
+  LightGBM sa MSE funkcijom gubitka   XGBoost sa MSE / Poisson / Tweedie gubitkom         3.4, 7.2
+  Globalni model uči iz istih 100     Globalni model uči iz više serija (kategorija,      4.2, 4.3
+  serija                              sve intermitentne, svih 30.490), ocena na istih
+                                      100
+  Samo intermitentne serije           Sve četiri ADI/CV2 klase                            7.3
+  Samo direktna strategija            Rekurzivna naspram direktne                         4.5, 7.5
+  Samo RMSSE                          Pristrasnost, prognoza ispod/iznad stvarne prodaje, 5.4
+                                      MASE
+  Nema interpretacije                 SHAP: koje lag vrednosti model koristi              7.6
+
+PREPORUKA - tri glavna pitanja:
+
+  (1) Benchmark metode (7.1)
+      Neophodno i jeftino. Njihov RMSSE od oko 0,77 ne znači mnogo bez poređenja sa Crostonom
+      i TSB-om. Ako ML jedva pobeđuje jednostavne metode kada ima samo lag vrednosti, i to je
+      važan nalaz.
+
+  (2) Funkcija gubitka uz XGBoost (7.2)
+      Usklađuje rad sa naslovom i testira nešto suštinsko za intermitentnu potražnju. Tweedie
+      su koristili pobednici M5. Tehnička napomena: MinMax skaliranje ne odgovara dobro
+      Poisson i Tweedie gubitku, pa će verovatno trebati drugačije skaliranje (npr. deljenje
+      prosekom serije).
+
+  (3) Iz koliko serija uči globalni model (4.3)
+      Najoriginalnije proširenje, jer direktno nastavlja njihovo glavno pitanje. Oni porede
+      "1 serija" i "100 serija". Mi pitamo da li dobitak raste sa više serija i da li je bolje
+      udruživati slične serije (ista kategorija, ista klasa potražnje) ili sve. Teorijska
+      osnova: Montero-Manso & Hyndman (2021). Izvodljivo za XGBoost i LightGBM, preskupo za
+      LSTM.
+
+Bez novog treniranja (na postojećim prognozama): dodatne metrike, SHAP, rezultati po
+podgrupama.
+
+I sama replikacija je doprinos: provera da li se rezultati rada iz 2025. mogu ponoviti, uz
+dokumentovane detalje koje rad ne navodi.
+
+
+3. PROŠIRENJE EGZOGENIM PODACIMA (opciono, uz tačku 2)
+-------------------------------------------------------
+
+3.1 Šta M5 ima od egzogenih podataka
+
+  Kalendar (calendar.csv), poznat unapred:
+    - dan u nedelji, mesec, godina
+      EDA: subota +19-26%, utorak-četvrtak -10-15% u odnosu na nedeljni prosek
+    - 30 događaja na 162 dana, 4 tipa (verski 55, nacionalni 52, kulturni 37, sportski 18)
+      EDA: Dan zahvalnosti -28%, Nova godina -23%, Praznik rada +28%, Božić zatvoreno
+    - SNAP, 10 dana mesečno, različiti dani po državi
+      EDA: hrana +10% (CA), +15% (TX), +29% (WI); ostale kategorije samo 1-3%
+
+  Cene (sell_prices.csv), pokrivaju i test period do d_1969:
+    - nedeljna cena po artiklu i prodavnici
+      EDA: 66-80% serija menja cenu; cena 5-10% niža od uobičajene -> prodaja +10-16%
+
+  Nema: promocija, stanja zaliha, vremenskih uslova, broja kupaca, opisa artikala.
+  Uzorak iz replikacije: 50 serija hrane, 32 domaćinstvo, 18 hobi, pa je SNAP relevantan za
+  polovinu uzorka.
+
+3.2 Osnovni princip
+
+  Svako obeležje mora biti poznato u trenutku pravljenja prognoze, za svih 28 dana unapred.
+  Inače informacija iz budućnosti procuri u model.
+
+3.3 Predlog po prioritetu
+
+  Prioritet 1 - izvedena obeležja iz kalendara i cena (mala cena, najveći očekivani dobitak):
+    - blizina događaja: dani do sledećeg / od prethodnog događaja (Dan zahvalnosti, Božić,
+      Uskrs, Super Bowl); kupovina se dešava pre praznika
+    - SNAP za državu te prodavnice, redni dan u SNAP periodu
+    - ciklus plata: dan u mesecu, početak i sredina meseca
+    - dubina popusta: cena / uobičajena cena artikla; pad cene u odnosu na prošlu nedelju
+      (zamena za promociju, koja ne postoji u podacima)
+    - relativna cena: u odnosu na prosek odeljenja u prodavnici i na isti artikal u drugim
+      prodavnicama (zamenski artikli)
+    - dostupnost: da li cena postoji, broj nedelja od uvođenja artikla
+
+  Prioritet 2 - spoljni podaci koji su deterministički i poznati unapred:
+    - raspored isplata socijalnih davanja: Social Security (srede), SSI (prvog u mesecu)
+    - sezona povraćaja poreza (februar-mart)
+    - školski raspust i povratak u školu po državi (EDA: domaćinstvo +10% avg-sep)
+
+  Ne preporučujem:
+    - vremenske uslove: prodavnice su anonimne (poznata je samo država), a stvarno vreme u
+      test periodu nije poznato u trenutku prognoze
+    - makro podatke (inflacija, gorivo, nezaposlenost): spori, malo govore o 28 dana,
+      drveća ne ekstrapoliraju
+    - Google Trends: artikli su anonimni
+
+3.4 Hipoteze iz rada koje možemo da testiramo
+
+  (a) "adding exogenous features back into the pipeline should compress the per-series-versus-
+      global gap most for LightGBM and RC, and least for LSTM"
+      -> hipoteza je o RAZLICI između modela po seriji i globalnog, ne o apsolutnoj tačnosti.
+         Nije testirana u radu.
+
+  (b) "Engineered transformations of the same signal (rolling means, time-since-last-demand,
+      lagged statistics) give diminishing returns as they do not introduce independent
+      variation."
+      -> obeležja izvedena iz prodaje trebalo bi da donesu manje od egzogenih.
+
+3.5 Predloženi dizajn
+
+  Isti uzorak od 100 serija i isti 3 x 2 dizajn, sa tri skupa ulaza:
+    1. samo lag vrednosti (replikacija)
+    2. + egzogena obeležja (prioritet 1, eventualno 2)
+    3. + obeležja izvedena iz prodaje (pokretni proseci, dani od poslednje prodaje)
+  SHAP vrednosti pokazuju koja obeležja model zaista koristi (odeljak 7.6).
+
+  Otvoreno pitanje: LightGBM/XGBoost primaju obeležja kao dodatne kolone, za svaki od 28
+  horizonata posebno. Za LSTM i ESN treba osmisliti kako uneti buduće vrednosti kalendara i
+  cena, jer sada vide samo prozor prošle prodaje.
+
+
+4. ZAKLJUČCI IZ EDA KOJI PODRŽAVAJU OVE PREDLOGE
+-------------------------------------------------
+
+  - 68,2% svih vrednosti su nule; 21,2% vrednosti su nule pre prve prodaje (nisu potražnja)
+  - u aktivnom periodu 59,5% dana je bez prodaje; 90,8% serija je intermitentno ili lumpy
+  - nule postoje samo na nivoima 10-12 hijerarhije (14% / 33% / 60%)
+  - autokorelacija na docnji 7: 0,76 za ukupnu prodaju, 0,09 za medijanu serija
+    artikal x prodavnica -> pojedinačna serija je uglavnom šum, što je argument za globalni
+    model
+  - na docnji 28 medijana autokorelacije je oko 0,06 -> na horizontu od 28 dana ostaje malo
+    signala iz same prodaje
+  - 48% serija ima period od 91+ uzastopnih dana bez prodaje (moguće nestašice ili
+    povlačenje iz prodaje; bez podataka o zalihama ne mogu se razlikovati od nulte potražnje)
+
+
+5. ZA RAZGOVOR SA MENTOROM
+--------------------------
+
+  - Koliko proširenja ulazi u rad: preporuka su tri glavna pitanja iz tačke 2.
+  - Da li se dodaju egzogena obeležja (tačka 3), i ako da, samo za LightGBM/XGBoost ili i za
+    LSTM/ESN.
+  - Računarski budžet: puna replikacija traje oko dva dana na 6-jezgarnom procesoru (najviše
+    zbog LSTM-a). Proširenja treba planirati u skladu s tim.
+  - Podela podataka: replikacija koristi podelu iz rada (trening d_1-1885, validacija
+    d_1886-1913, test d_1914-1941). Za proširenja treba odlučiti da li ostaje ista podela ili
+    se konačna ocena radi na d_1942-1969.

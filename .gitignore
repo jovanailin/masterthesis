@@ -2,6 +2,9 @@
 # Download instructions are in README.md.
 data/
 
+# Literature in the project root (copyrighted books and papers), kept locally only
+/*.pdf
+
 # Credentials
 kaggle.json
 access_token

@@ -1,0 +1,6 @@
+,series,share_of_all
+All item-store series,30490,1.0
+1. ADF: unit root rejected (p < 0.05),29046,0.9526402099048868
+"2. Ljung-Box: autocorrelation at lag 13, 26 or 52",25926,0.8503115775664152
+3. SBC class defined,25926,0.8503115775664152
+"4. Intermittent quadrant (ADI > 1.32, CV² <= 0.49)",18488,0.6063627418825844

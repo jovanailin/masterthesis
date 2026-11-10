@@ -1,0 +1,80 @@
+feature,group,description
+lag_1,L,sales on day t - 0
+lag_2,L,sales on day t - 1
+lag_3,L,sales on day t - 2
+lag_4,L,sales on day t - 3
+lag_5,L,sales on day t - 4
+lag_6,L,sales on day t - 5
+lag_7,L,sales on day t - 6
+lag_8,L,sales on day t - 7
+lag_9,L,sales on day t - 8
+lag_10,L,sales on day t - 9
+lag_11,L,sales on day t - 10
+lag_12,L,sales on day t - 11
+lag_13,L,sales on day t - 12
+lag_14,L,sales on day t - 13
+lag_15,L,sales on day t - 14
+lag_16,L,sales on day t - 15
+lag_17,L,sales on day t - 16
+lag_18,L,sales on day t - 17
+lag_19,L,sales on day t - 18
+lag_20,L,sales on day t - 19
+lag_21,L,sales on day t - 20
+lag_22,L,sales on day t - 21
+lag_23,L,sales on day t - 22
+lag_24,L,sales on day t - 23
+lag_25,L,sales on day t - 24
+lag_26,L,sales on day t - 25
+lag_27,L,sales on day t - 26
+lag_28,L,sales on day t - 27
+lag_29,L,sales on day t - 28
+lag_30,L,sales on day t - 29
+lag_31,L,sales on day t - 30
+lag_32,L,sales on day t - 31
+lag_33,L,sales on day t - 32
+lag_34,L,sales on day t - 33
+lag_35,L,sales on day t - 34
+lag_36,L,sales on day t - 35
+lag_37,L,sales on day t - 36
+lag_38,L,sales on day t - 37
+lag_39,L,sales on day t - 38
+lag_40,L,sales on day t - 39
+lag_41,L,sales on day t - 40
+lag_42,L,sales on day t - 41
+lag_43,L,sales on day t - 42
+lag_44,L,sales on day t - 43
+lag_45,L,sales on day t - 44
+lag_46,L,sales on day t - 45
+lag_47,L,sales on day t - 46
+lag_48,L,sales on day t - 47
+lag_49,L,sales on day t - 48
+lag_50,L,sales on day t - 49
+lag_51,L,sales on day t - 50
+lag_52,L,sales on day t - 51
+lag_53,L,sales on day t - 52
+lag_54,L,sales on day t - 53
+lag_55,L,sales on day t - 54
+lag_56,L,sales on day t - 55
+wday,E,"weekday of the target day (M5 coding, 1 = Saturday)"
+event,E,"event on the target day (30 named events, categorical; none = no event)"
+event_type,E,"event type on the target day: Cultural, National, Religious, Sporting (categorical)"
+days_to_event,E,days from the target day to the next event (0 on an event day)
+days_since_event,E,days from the previous event to the target day (0 on an event day)
+snap,E,SNAP day in the store's state on the target day (0/1)
+rel_price,E,price in the target week / the series' median price in the training weeks
+price_change,E,price in the target week / price in the previous week - 1
+discount,E,1 - price in the target week / highest price of the last 52 weeks
+mean_7,S,mean daily sales over the last 7 days
+mean_28,S,mean daily sales over the last 28 days
+mean_56,S,mean daily sales over the last 56 days
+mean_182,S,mean daily sales over the last 182 days
+zero_share_28,S,share of days without sales over the last 28 days
+zero_share_182,S,share of days without sales over the last 182 days
+nz_mean_56,S,mean sales on days with sales over the last 56 days
+days_since_sale,S,days since the last day with sales (0 = sales on day t)
+age,S,days since the first sale of the series (1 = first sale on day t)
+item_id,ID,"item (3,049, categorical)"
+dept_id,ID,"department (7, categorical)"
+cat_id,ID,"category (3, categorical)"
+store_id,ID,"store (10, categorical)"
+state_id,ID,"state (3, categorical)"

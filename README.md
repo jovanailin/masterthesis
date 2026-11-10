@@ -8,16 +8,17 @@ evaluated on the M5 (Walmart) dataset.
 | Path | Contents |
 |---|---|
 | `notebooks/01_eda.ipynb` | Exploratory data analysis (thesis Section 6.2) |
-| `notebooks/02_replication.ipynb` | Replication of the 3 × 2 pooling study of Tsantilis et al. (2025) |
+| `notebooks/02_data_preparation.ipynb` | Inputs of the direct forecasting models and their checks (Section 6.3) |
 | `src/m5_data.py` | Data loading, day indices of the train/validation/test split, the 12 M5 hierarchy levels |
+| `src/features.py` | Panel of sales, calendar and price inputs; origins and design matrices of the horizon models |
 | `src/intermittency.py` | Demand statistics (zero share, ADI, CV²) and the Syntetos–Boylan–Croston classification |
-| `src/series_sampling.py` | ADF / Ljung–Box screens and the stratified (Hamilton) sample of intermittent series |
-| `src/forecasters.py` | LightGBM, LSTM and echo state network direct 28-day forecasters, Hyperopt search spaces |
-| `src/experiment.py` | Tuning, top-3 ensembles and RMSSE for the six cells; resumable command-line runner |
-| `src/factorial_stats.py` | Wilcoxon–Holm, Friedman–Nemenyi, CD diagram; reference values of the paper |
+| `src/series_sampling.py` | Stratified sample of series with a largest-remainder (Hamilton) allocation |
+| `src/factorial_stats.py` | Wilcoxon–Holm, Friedman–Nemenyi, critical difference diagram |
 | `src/plot_style.py` | Shared style for the thesis figures |
 | `figures/` | Figures used in the thesis (PNG and PDF) |
 | `results/` | Tables produced by the notebooks (CSV) |
+| `archive/replication/` | Abandoned replication of Tsantilis et al. (2025), kept for reference |
+| `*.docx` | Working documents: EDA summary, summary of Tsantilis et al. (2025), thesis proposal |
 | `data/` | Not tracked by git; see below |
 
 ## Data
@@ -57,24 +58,8 @@ findings, and conclusions. *International Journal of Forecasting*, 38(4), 1346�
 ```bash
 pip install -r requirements.txt
 python -m nbconvert --to notebook --execute --inplace notebooks/01_eda.ipynb
+python -m nbconvert --to notebook --execute --inplace notebooks/02_data_preparation.ipynb
 ```
 
-The EDA notebook runs in about 1–2 minutes.
-
-### Replication (notebook 02)
-
-The full protocol of Tsantilis et al. (2025) tunes every cell with 100 Hyperopt evaluations, per series in the
-per-series regime. On a 6-core CPU without a GPU this takes about two days, mostly for the two LSTM cells
-(LightGBM and ESN cells: about 9 hours). Results are cached in `results/replication/runs/<run>/`, so the run
-can be interrupted and resumed. Start it outside Jupyter, then execute the notebook to build the tables and
-figures from the cached results:
-
-```bash
-python src/experiment.py --run full --cells all --max-evals 100 --n-jobs 6   # resumable
-python -m nbconvert --to notebook --execute --inplace notebooks/02_replication.ipynb
-```
-
-The first part of the notebook (sample selection) must run once before the experiment, because it writes
-`results/replication/sample.csv`. For a quick end-to-end check use a separate run name, e.g.
-`--run smoke --max-evals 2 --n-series 12` and the environment variables `REPLICATION_RUN=smoke`,
-`REPLICATION_MAX_EVALS=2`, `REPLICATION_N_SERIES=12` for the notebook.
+The EDA notebook runs in about 1–2 minutes and the data preparation in about 3 minutes. The data preparation
+saves the panel of inputs to `data/processed/panel/`, which the modelling notebooks load.

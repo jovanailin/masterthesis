@@ -9,8 +9,11 @@ evaluated on the M5 (Walmart) dataset.
 |---|---|
 | `notebooks/01_eda.ipynb` | Exploratory data analysis (thesis Section 6.2) |
 | `notebooks/02_data_preparation.ipynb` | Inputs of the direct forecasting models and their checks (Section 6.3) |
+| `notebooks/03_benchmarks.ipynb` | Classical benchmark methods, accuracy measures, validation scores (Sections 5.3, 6.4) |
 | `src/m5_data.py` | Data loading, day indices of the train/validation/test split, the 12 M5 hierarchy levels |
 | `src/features.py` | Panel of sales, calendar and price inputs; origins and design matrices of the horizon models |
+| `src/benchmarks.py` | Naive, seasonal naive, mean, Croston, SBA, TSB and ADIDA forecasts for all series |
+| `src/metrics.py` | RMSSE, WRMSSE over the 12 levels (checked against the official weights), MASE, bias |
 | `src/intermittency.py` | Demand statistics (zero share, ADI, CV²) and the Syntetos–Boylan–Croston classification |
 | `src/series_sampling.py` | Stratified sample of series with a largest-remainder (Hamilton) allocation |
 | `src/factorial_stats.py` | Wilcoxon–Holm, Friedman–Nemenyi, critical difference diagram |
@@ -59,7 +62,8 @@ findings, and conclusions. *International Journal of Forecasting*, 38(4), 1346�
 pip install -r requirements.txt
 python -m nbconvert --to notebook --execute --inplace notebooks/01_eda.ipynb
 python -m nbconvert --to notebook --execute --inplace notebooks/02_data_preparation.ipynb
+python -m nbconvert --to notebook --execute --inplace notebooks/03_benchmarks.ipynb
 ```
 
-The EDA notebook runs in about 1–2 minutes and the data preparation in about 3 minutes. The data preparation
-saves the panel of inputs to `data/processed/panel/`, which the modelling notebooks load.
+The EDA notebook runs in about 1–2 minutes, the data preparation in about 3 and the benchmarks in about 2. The data preparation
+saves the panel of inputs to `data/processed/panel/`, which the later notebooks load, so it must run before them.

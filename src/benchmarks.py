@@ -128,3 +128,13 @@ def forecast_all(y: np.ndarray, horizon: int = HORIZON) -> dict[str, np.ndarray]
     """Forecasts of every method from the history y (n_series, n_days) up to the forecast origin."""
     funcs = {"naive": naive, "snaive": snaive, "mean": mean, "croston": croston, "sba": sba, "tsb": tsb, "adida": adida}
     return {m: funcs[m](y, horizon) for m in METHODS}
+
+
+def forecast_rolling(y: np.ndarray, first_origin: int, weeks: int, horizon: int = HORIZON) -> dict[str, np.ndarray]:
+    """Forecasts from `weeks` origins `horizon` days apart, side by side: (n_series, weeks * horizon).
+
+    `y` has a dummy column 0 (day d is column d) and must hold the sales up to the last origin; every
+    method is recomputed from the history up to each origin.
+    """
+    parts = [forecast_all(y[:, 1 : first_origin + horizon * k + 1], horizon) for k in range(weeks)]
+    return {m: np.concatenate([p[m] for p in parts], axis=1) for m in METHODS}

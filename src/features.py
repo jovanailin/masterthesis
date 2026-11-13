@@ -30,8 +30,9 @@ HORIZON = m5.HORIZON
 ROLL_WINDOWS = (7, 28, 56, 182)
 DISCOUNT_WEEKS = 52  # regular price = highest price of the last 52 weeks
 
-# Forecast origin (last observed day) of each stage: tuning forecasts the validation window from
-# d_1913, the final models are refitted up to d_1941 and forecast the test window.
+# First forecast origin (last training day) of each stage: tuning forecasts the validation window with
+# models fitted up to d_1913, the final models are refitted up to d_1941 and forecast the test window.
+# Each window is forecast 7 days at a time from m5.EVAL_WEEKS weekly origins (forecast_origins).
 STAGES = {"valid": m5.TRAIN_END, "test": m5.VALID_END}
 
 LAG_COLS = [f"lag_{j}" for j in range(1, N_LAGS + 1)]
@@ -210,8 +211,15 @@ def training_origins(panel: Panel, stage: str, stride: int = 7) -> tuple[np.ndar
 
 
 def forecast_origins(panel: Panel, stage: str) -> tuple[np.ndarray, np.ndarray]:
+    """The EVAL_WEEKS weekly origins of the stage's window for every series, origin by origin.
+
+    The later origins need the sales observed up to them: for the test stage the panel must hold the test
+    sales, which are loaded only in the final evaluation.
+    """
     n = len(panel.ids)
-    return np.arange(n, dtype=np.int32), np.full(n, STAGES[stage], dtype=np.int16)
+    origins = STAGES[stage] + HORIZON * np.arange(m5.EVAL_WEEKS)
+    assert origins[-1] < panel.y.shape[1], f"the panel has no sales up to the origin d_{origins[-1]}"
+    return np.tile(np.arange(n, dtype=np.int32), origins.size), np.repeat(origins, n).astype(np.int16)
 
 
 def origin_table(panel: Panel, series: np.ndarray, t: np.ndarray) -> OriginTable:

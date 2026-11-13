@@ -5,8 +5,9 @@ its own history, from its first non-zero sale to the forecast origin (the M5 con
 M5 measure, averages the RMSSE of all 42,840 series of the 12 hierarchy levels: within a level each series is
 weighted by its dollar sales in the 28 days up to the forecast origin, and the 12 levels count equally.
 
-The official M5 score is computed over 28 days; here the same measure is computed over the 7 forecast
-days, with the official scales and weights. As in the official M5 evaluation, the scales are computed on the raw sales history, with Christmas Day as
+The official M5 score is computed on one 28-day forecast. Here the same 28 days are forecast 7 days at a
+time from 4 weekly origins, and the measure is computed on these 28 days with the official scales and
+weights of the first origin. As in the official M5 evaluation, the scales are computed on the raw sales history, with Christmas Day as
 recorded (zero sales).
 """
 import numpy as np

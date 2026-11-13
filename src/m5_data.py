@@ -23,7 +23,11 @@ ID_COLS = ["item_id", "dept_id", "cat_id", "store_id", "state_id"]
 TRAIN_END = 1913  # last training day
 VALID_END = 1941  # last day of the Kaggle release; origin of the test forecasts
 TEST_END = 1969  # final test horizon: d_1942 - d_1969
-HORIZON = 7  # days forecast from each origin: validation d_1914 - d_1920, test d_1942 - d_1948
+HORIZON = 7  # days forecast from each origin
+# Rolling evaluation: each 28-day window is forecast from 4 weekly origins (validation d_1913, d_1920,
+# d_1927, d_1934; test d_1941, ..., d_1962). The models are not refitted between the origins, but their
+# inputs use the sales observed up to each origin.
+EVAL_WEEKS = 4
 
 # The 12 aggregation levels of the M5 hierarchy (42,840 series in total).
 LEVELS = {

@@ -55,8 +55,8 @@ redistribution.
 | Validation | `d_1914` – `d_1941` | 2016-04-25 – 2016-05-22 | tuning |
 | Test | `d_1942` – `d_1969` | 2016-05-23 – 2016-06-19 | final evaluation only |
 
-Forecasts cover 7 days from each origin: the validation scores use `d_1914` – `d_1920` and the final test
-`d_1942` – `d_1948`.
+Forecasts cover 7 days. Each 28-day window is forecast from 4 weekly origins (rolling evaluation): the models
+are not refitted between the origins, but their inputs use the sales observed up to each origin.
 
 Source: Makridakis, S., Spiliotis, E., & Assimakopoulos, V. (2022). M5 accuracy competition: Results,
 findings, and conclusions. *International Journal of Forecasting*, 38(4), 1346–1364.

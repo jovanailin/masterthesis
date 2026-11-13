@@ -1,0 +1,16 @@
+{
+  "id": "jovanailin/m5-xgboost-speed-test",
+  "title": "m5-xgboost-speed-test",
+  "code_file": "speed_test.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "machine_shape": "",
+  "dataset_sources": ["jovanailin/m5-thesis-src"],
+  "competition_sources": ["m5-forecasting-accuracy"],
+  "kernel_sources": [],
+  "model_sources": []
+}

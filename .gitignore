@@ -20,3 +20,6 @@ venv/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Local outputs of the Kaggle jobs (smoke tests)
+kaggle_jobs/*/out/

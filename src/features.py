@@ -1,7 +1,8 @@
-"""Inputs of the direct 28-day forecasting models.
+"""Inputs of the 7-day forecasting models.
 
-A training example is a pair (series i, forecast origin t): the model sees the sales up to day t and
-predicts day t + h, with one model per horizon h = 1..28 (direct strategy). The inputs form four groups:
+A training example is a triple (series i, forecast origin t, horizon h): the model sees the sales up to
+day t and predicts day t + h. One model forecasts all horizons h = 1..7 and gets h as an input, so no
+forecast is fed back into the model. Besides h, the inputs form four groups:
 
 - L, lags: sales on days t, t-1, ..., t-55;
 - E, exogenous inputs known in advance for the target day t + h: weekday, event and the distance to the
@@ -25,6 +26,7 @@ import pandas as pd
 import m5_data as m5
 
 N_LAGS = 56
+HORIZON = m5.HORIZON
 ROLL_WINDOWS = (7, 28, 56, 182)
 DISCOUNT_WEEKS = 52  # regular price = highest price of the last 52 weeks
 
@@ -39,8 +41,10 @@ E_COLS = ["wday", "event", "event_type", "days_to_event", "days_since_event", "s
           "rel_price", "price_change", "discount"]
 ID_COLS = ["item_id", "dept_id", "cat_id", "store_id", "state_id"]
 GROUPS = {"L": LAG_COLS, "E": E_COLS, "S": S_COLS, "ID": ID_COLS}
+H_COL = "h"  # always an input, whatever the groups
 
 FEATURE_INFO = {
+    H_COL: ("h", f"horizon: days from the origin t to the target day (1..{HORIZON})"),
     **{c: ("L", f"sales on day t - {j - 1}") for j, c in enumerate(LAG_COLS, 1)},
     "wday": ("E", "weekday of the target day (M5 coding, 1 = Saturday)"),
     "event": ("E", "event on the target day (30 named events, categorical; none = no event)"),
@@ -195,8 +199,8 @@ class OriginTable:
 def training_origins(panel: Panel, stage: str, stride: int = 7) -> tuple[np.ndarray, np.ndarray]:
     """Origins t = T - stride * k (k >= 1) from each series' first sale, T = the stage's forecast origin.
 
-    With stride 7 every origin falls on the weekday of T (a Sunday in both stages), so that the target
-    weekday of each horizon model is the same in training and in the forecast.
+    With stride 7 every origin falls on the weekday of T (a Sunday in both stages), so that each horizon
+    has the same target weekday in training and in the forecast.
     """
     T = STAGES[stage]
     t_all = np.arange(T - stride, 0, -stride)[::-1].astype(np.int16)
@@ -243,26 +247,41 @@ def origin_table(panel: Panel, series: np.ndarray, t: np.ndarray) -> OriginTable
 # --------------------------------------------------------------------------- design matrix
 
 
-def design(panel: Panel, table: OriginTable, h: int, groups=("L", "E", "S", "ID"), target: bool = True,
-           stage: str | None = None):
-    """Inputs (and target) of the horizon-h model for the rows of `table`.
+def horizon_rows(n: int, per_origin: int | None = None, seed: int = 0) -> tuple[np.ndarray, np.ndarray]:
+    """Pairs (origin row, horizon) for `n` origins: all HORIZON horizons of each origin, or `per_origin`
+    of them drawn at random without replacement (to limit the number of training rows)."""
+    if per_origin is None or per_origin >= HORIZON:
+        return np.repeat(np.arange(n), HORIZON), np.tile(np.arange(1, HORIZON + 1, dtype=np.int16), n)
+    rng = np.random.default_rng(seed)
+    h = np.argsort(rng.random((n, HORIZON), dtype=np.float32), axis=1)[:, :per_origin] + 1
+    return np.repeat(np.arange(n), per_origin), np.sort(h, axis=1).ravel().astype(np.int16)
 
-    For training (`target=True`) only rows whose target day t + h is observed in the stage
-    (t + h <= T) and is not Christmas are kept. Returns X, y (None for a forecast) and the row mask.
+
+def design(panel: Panel, table: OriginTable, h, groups=("L", "E", "S", "ID"), target: bool = True,
+           stage: str | None = None, rows: np.ndarray | None = None):
+    """Inputs (and target) for origin rows `rows` of `table` (default: all) at horizon(s) `h`.
+
+    `h` is one horizon or an array aligned with `rows`, as returned by `horizon_rows`. For training
+    (`target=True`) only rows whose target day t + h is observed in the stage (t + h <= T) and is not
+    Christmas are kept. Returns X, y (None for a forecast) and the mask of the kept rows.
     """
-    d = table.t.astype(np.int64) + h
+    if rows is None:
+        rows = np.arange(len(table))
+    h = np.broadcast_to(np.asarray(h, dtype=np.int64), rows.shape)
+    d = table.t[rows].astype(np.int64) + h
     if target:
         T = STAGES[stage]
         keep = d <= T
-        y = np.where(keep, panel.y[table.series, np.minimum(d, panel.y.shape[1] - 1)], np.nan)
+        y = np.where(keep, panel.y[table.series[rows], np.minimum(d, panel.y.shape[1] - 1)], np.nan)
         keep &= ~np.isnan(y)
     else:
-        keep = np.ones(len(table), dtype=bool)
-    i, d = table.series[keep], d[keep]
+        keep = np.ones(rows.size, dtype=bool)
+    rows, d = rows[keep], d[keep]
+    i = table.series[rows]
 
-    parts = []
+    parts = [pd.DataFrame({H_COL: h[keep].astype(np.float32)})]
     if "L" in groups:
-        parts.append(pd.DataFrame(table.lags[keep], columns=LAG_COLS))
+        parts.append(pd.DataFrame(table.lags[rows], columns=LAG_COLS))
     if "E" in groups:
         cal = panel.cal.iloc[d].reset_index(drop=True)
         w = panel.week[d]
@@ -270,7 +289,7 @@ def design(panel: Panel, table: OriginTable, h: int, groups=("L", "E", "S", "ID"
                        **{k: v[i, w] for k, v in panel.price.items()})
         parts.append(e[E_COLS])
     if "S" in groups:
-        parts.append(table.s[keep].reset_index(drop=True))
+        parts.append(table.s.iloc[rows].reset_index(drop=True))
     if "ID" in groups:
         parts.append(panel.hier.iloc[i].reset_index(drop=True))
     X = pd.concat(parts, axis=1)

@@ -5,23 +5,25 @@ the final test horizon (d_1942 - d_1969) is not part of the Kaggle release and i
 from the Nixtla mirror (data/raw), which was verified to be identical to Kaggle on all
 overlapping files.
 """
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-KAGGLE_DIR = ROOT / "data" / "kaggle"
-NIXTLA_DIR = ROOT / "data" / "raw"
-PROCESSED_DIR = ROOT / "data" / "processed"
+# The environment variables point to the data when the code runs elsewhere (Kaggle kernels, kaggle_jobs/).
+KAGGLE_DIR = Path(os.environ.get("M5_KAGGLE_DIR", ROOT / "data" / "kaggle"))
+NIXTLA_DIR = Path(os.environ.get("M5_NIXTLA_DIR", ROOT / "data" / "raw"))
+PROCESSED_DIR = Path(os.environ.get("M5_PROCESSED_DIR", ROOT / "data" / "processed"))
 
 ID_COLS = ["item_id", "dept_id", "cat_id", "store_id", "state_id"]
 
 # Day indices are 1-based, as in the M5 column names d_1 ... d_1969.
 TRAIN_END = 1913  # last training day
-VALID_END = 1941  # validation horizon: d_1914 - d_1941
+VALID_END = 1941  # last day of the Kaggle release; origin of the test forecasts
 TEST_END = 1969  # final test horizon: d_1942 - d_1969
-HORIZON = 28
+HORIZON = 7  # days forecast from each origin: validation d_1914 - d_1920, test d_1942 - d_1948
 
 # The 12 aggregation levels of the M5 hierarchy (42,840 series in total).
 LEVELS = {

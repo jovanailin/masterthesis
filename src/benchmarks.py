@@ -1,6 +1,6 @@
 """Classical benchmark forecasts for intermittent demand (thesis Section 6.4).
 
-Every method forecasts the 28 days after the forecast origin from the history up to the origin, for all series
+Every method forecasts the 7 days after the forecast origin from the history up to the origin, for all series
 at once. The history is that of the panel (`features.Panel.y`): it starts at the series' first sale and
 Christmas Day is missing; the recursive methods skip missing days.
 
@@ -20,7 +20,7 @@ import numpy as np
 
 ALPHA = 0.1  # smoothing of demand sizes and intervals (Croston, SBA, TSB, ADIDA)
 BETA = 0.1  # smoothing of the demand probability (TSB)
-HORIZON = 28
+HORIZON = 7
 METHODS = ["naive", "snaive", "mean", "croston", "sba", "tsb", "adida"]
 
 

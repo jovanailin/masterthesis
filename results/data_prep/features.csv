@@ -1,4 +1,5 @@
 feature,group,description
+h,h,horizon: days from the origin t to the target day (1..7)
 lag_1,L,sales on day t - 0
 lag_2,L,sales on day t - 1
 lag_3,L,sales on day t - 2

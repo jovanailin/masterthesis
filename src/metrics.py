@@ -1,11 +1,12 @@
-"""Accuracy measures of the 28-day forecasts (thesis Section 5.3).
+"""Accuracy measures of the 7-day forecasts (thesis Section 5.3).
 
 RMSSE and MASE divide the forecast error of a series by the in-sample error of the one-step naive forecast on
 its own history, from its first non-zero sale to the forecast origin (the M5 convention). WRMSSE, the official
 M5 measure, averages the RMSSE of all 42,840 series of the 12 hierarchy levels: within a level each series is
 weighted by its dollar sales in the 28 days up to the forecast origin, and the 12 levels count equally.
 
-As in the official M5 evaluation, the scales are computed on the raw sales history, with Christmas Day as
+The official M5 score is computed over 28 days; here the same measure is computed over the 7 forecast
+days, with the official scales and weights. As in the official M5 evaluation, the scales are computed on the raw sales history, with Christmas Day as
 recorded (zero sales).
 """
 import numpy as np

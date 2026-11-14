@@ -13,6 +13,7 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+KERNEL_SOURCES = {"final": ["m5-global-xgb-tweedie"], "extra": ["m5-global-xgb-tweedie"]}  # earlier kernels whose outputs the job reads
 
 
 def main(job: str) -> None:
@@ -23,7 +24,8 @@ def main(job: str) -> None:
     meta = {"id": f"{user}/{slug}", "title": slug, "code_file": "job.py", "language": "python",
             "kernel_type": "script", "is_private": "true", "enable_gpu": "true", "enable_tpu": "false",
             "enable_internet": "true", "machine_shape": "", "dataset_sources": [f"{user}/m5-thesis-src"],
-            "competition_sources": ["m5-forecasting-accuracy"], "kernel_sources": [], "model_sources": []}
+            "competition_sources": ["m5-forecasting-accuracy"],
+            "kernel_sources": [f"{user}/{k}" for k in KERNEL_SOURCES.get(job, [])], "model_sources": []}
     with tempfile.TemporaryDirectory() as tmp:
         (Path(tmp) / "job.py").write_text(code.replace('"@JOB@"', f'"{job}"'), encoding="utf-8", newline="\n")
         (Path(tmp) / "kernel-metadata.json").write_text(json.dumps(meta, indent=1))

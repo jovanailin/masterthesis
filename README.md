@@ -7,25 +7,25 @@ evaluated on the M5 (Walmart) dataset.
 
 | Path | Contents |
 |---|---|
-| `notebooks/01_eda.ipynb` | Exploratory data analysis (thesis Section 6.2) |
-| `notebooks/02_data_preparation.ipynb` | Inputs of the direct forecasting models and their checks (Section 6.3) |
-| `notebooks/03_benchmarks.ipynb` | Classical benchmark methods, accuracy measures, validation scores (Sections 5.3, 6.4) |
+| `notebooks/01_eda.ipynb` | Exploratory data analysis and demand classes (thesis Sections 6.2, 6.3) |
+| `notebooks/02_data_preparation.ipynb` | Inputs of the direct forecasting models and their checks (Section 6.4) |
+| `notebooks/03_benchmarks.ipynb` | Classical benchmark methods, accuracy measures, validation scores (Sections 5.2, 5.3, 6.5, 7.1) |
 | `src/m5_data.py` | Data loading, day indices of the train/validation/test split, the 12 M5 hierarchy levels |
 | `src/features.py` | Panel of sales, calendar and price inputs; origins and design matrices of the 7-day models (horizon as an input) |
 | `src/benchmarks.py` | Naive, seasonal naive, mean, Croston, SBA, TSB and ADIDA forecasts for all series |
 | `src/metrics.py` | RMSSE, WRMSSE over the 12 levels (checked against the official weights), MASE, bias |
-| `src/global_xgb.py` | Global XGBoost: variants, Hyperopt tuning on the validation window, refit for the test window |
+| `src/global_xgb.py` | Global XGBoost: variants, Hyperopt tuning on the validation window, refit for the test window; models per store and per demand class; recursive strategy (Sections 6.6, 7.2, 7.7) |
 | `src/intermittency.py` | Demand statistics (zero share, ADI, CV²) and the Syntetos–Boylan–Croston classification |
 | `src/series_sampling.py` | Stratified sample of series with a largest-remainder (Hamilton) allocation |
 | `src/factorial_stats.py` | Wilcoxon–Holm, Friedman–Nemenyi, critical difference diagram |
 | `src/plot_style.py` | Shared style for the thesis figures |
 | `kaggle_jobs/` | Jobs that run as Kaggle GPU kernels; `upload_src.py` puts `src/` into a private Kaggle dataset for them |
 | `kaggle_jobs/speed_test/` | GPU speed test of the global XGBoost (results in `results/kaggle/speed_test/`) |
-| `kaggle_jobs/global_xgb/` | Tuning and refit of the global XGBoost variants, one kernel per loss (`push.py <job>`) |
+| `kaggle_jobs/global_xgb/` | Kaggle kernels of the XGBoost models (`push.py <job>`): tuning and refit of the global variants (one kernel per loss), seeds, models per store and per demand class, recursive strategy |
 | `figures/` | Figures used in the thesis (PNG and PDF) |
 | `results/` | Tables produced by the notebooks (CSV) |
 | `archive/replication/` | Abandoned replication of Tsantilis et al. (2025), kept for reference |
-| `*.docx`, `Pregled modela.xlsx` | Working documents: EDA summary, summary of Tsantilis et al. (2025), thesis proposal, overview of the models |
+| `*.docx`, `Pregled modela.xlsx`, `Primer dataseta.xlsx` | Working documents: EDA summary, summary of Tsantilis et al. (2025), thesis proposal, overview of the models and their validation scores, example rows of the training tables |
 | `data/` | Not tracked by git; see below |
 
 ## Data

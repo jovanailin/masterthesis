@@ -1,4 +1,4 @@
-"""Accuracy measures of the 7-day forecasts (thesis Section 5.3).
+"""Accuracy measures of the 7-day forecasts (thesis Sections 5.2 and 5.3).
 
 RMSSE and MASE divide the forecast error of a series by the in-sample error of the one-step naive forecast on
 its own history, from its first non-zero sale to the forecast origin (the M5 convention). WRMSSE, the official

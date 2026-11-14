@@ -1,4 +1,4 @@
-"""Classical benchmark forecasts for intermittent demand (thesis Section 6.4).
+"""Classical benchmark forecasts for intermittent demand (thesis Section 6.5).
 
 Every method forecasts the 7 days after the forecast origin from the history up to the origin, for all series
 at once. The history is that of the panel (`features.Panel.y`): it starts at the series' first sale and

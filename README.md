@@ -14,12 +14,14 @@ evaluated on the M5 (Walmart) dataset.
 | `src/features.py` | Panel of sales, calendar and price inputs; origins and design matrices of the 7-day models (horizon as an input) |
 | `src/benchmarks.py` | Naive, seasonal naive, mean, Croston, SBA, TSB and ADIDA forecasts for all series |
 | `src/metrics.py` | RMSSE, WRMSSE over the 12 levels (checked against the official weights), MASE, bias |
+| `src/global_xgb.py` | Global XGBoost: variants, Hyperopt tuning on the validation window, refit for the test window |
 | `src/intermittency.py` | Demand statistics (zero share, ADI, CV²) and the Syntetos–Boylan–Croston classification |
 | `src/series_sampling.py` | Stratified sample of series with a largest-remainder (Hamilton) allocation |
 | `src/factorial_stats.py` | Wilcoxon–Holm, Friedman–Nemenyi, critical difference diagram |
 | `src/plot_style.py` | Shared style for the thesis figures |
 | `kaggle_jobs/` | Jobs that run as Kaggle GPU kernels; `upload_src.py` puts `src/` into a private Kaggle dataset for them |
 | `kaggle_jobs/speed_test/` | GPU speed test of the global XGBoost (results in `results/kaggle/speed_test/`) |
+| `kaggle_jobs/global_xgb/` | Tuning and refit of the global XGBoost variants, one kernel per loss (`push.py <job>`) |
 | `figures/` | Figures used in the thesis (PNG and PDF) |
 | `results/` | Tables produced by the notebooks (CSV) |
 | `archive/replication/` | Abandoned replication of Tsantilis et al. (2025), kept for reference |

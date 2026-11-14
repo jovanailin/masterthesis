@@ -70,6 +70,11 @@ FEATURE_INFO = {
 }
 
 
+def columns(groups) -> list[str]:
+    """Input columns of the given groups, in the order of the design matrix."""
+    return [H_COL, *(c for g, cols in GROUPS.items() if g in groups for c in cols)]
+
+
 def feature_table() -> pd.DataFrame:
     return pd.DataFrame([(c, g, d) for c, (g, d) in FEATURE_INFO.items()], columns=["feature", "group", "description"])
 
@@ -88,6 +93,12 @@ class Panel:
     state: np.ndarray  # (n,) row of `snap` for each series
     week: np.ndarray  # (TEST_END + 1,) week index of each day
     price: dict  # name -> (n, n_weeks) float32: rel_price, price_change, discount
+
+    def subset(self, rows: np.ndarray) -> "Panel":
+        """The panel of the series in `rows` only."""
+        return Panel(ids=self.ids.iloc[rows].reset_index(drop=True), hier=self.hier.iloc[rows].reset_index(drop=True),
+                     y=self.y[rows], first_sale=self.first_sale[rows], cal=self.cal, snap=self.snap,
+                     state=self.state[rows], week=self.week, price={k: v[rows] for k, v in self.price.items()})
 
     def save(self, path: Path) -> None:
         path.mkdir(parents=True, exist_ok=True)

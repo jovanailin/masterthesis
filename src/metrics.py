@@ -101,15 +101,22 @@ class Evaluator:
         self.mae_scale = naive_scale(hist, 1)
 
     @classmethod
-    def for_origin(cls, origin: int, actual_days: tuple[int, int] | None = None) -> "Evaluator":
-        """Evaluator built from the raw Kaggle files; `actual_days` (first, last) must lie within d_1 - d_1941."""
+    def for_origin(cls, origin: int, actual_days: tuple[int, int] | None = None,
+                   rows: np.ndarray | None = None) -> "Evaluator":
+        """Evaluator built from the raw Kaggle files; `actual_days` (first, last) must lie within d_1 - d_1941.
+
+        `rows` restricts it to a subset of the bottom series (for quick checks of the code).
+        """
         last = max(origin, actual_days[1] if actual_days else origin)
         assert last <= m5.VALID_END, "the test window d_1942 - d_1969 is read only in the final evaluation"
         sales = m5.load_sales(last_day=last)
+        revenue = dollar_sales(sales, origin)
+        if rows is not None:
+            sales, revenue = sales.iloc[rows], revenue[rows]
         hist = sales[m5.day_cols(1, origin)].to_numpy(np.float64)
         actual = sales[m5.day_cols(*actual_days)].to_numpy(np.float64) if actual_days else None
         hier = sales[m5.ID_COLS].astype(str)
-        return cls(hier, hist, dollar_sales(sales, origin), actual)
+        return cls(hier, hist, revenue, actual)
 
     def weights_table(self) -> pd.DataFrame:
         return pd.concat([keys.assign(weight=self.weight[lvl]) for lvl, (_, keys) in self.levels.items()], ignore_index=True)

@@ -14,7 +14,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 KERNEL_SOURCES = {"final": ["m5-global-xgb-tweedie"], "extra": ["m5-global-xgb-tweedie"],
-                  "store_cat": ["m5-global-xgb-tweedie"], "extra_id": ["m5-global-xgb-final"]}  # earlier kernels whose outputs the job reads
+                  "store_cat": ["m5-global-xgb-tweedie"], "extra_id": ["m5-global-xgb-final"],
+                  "backtest": ["m5-global-xgb-mse", "m5-global-xgb-poisson", "m5-global-xgb-tweedie", "m5-global-xgb-final",
+                               "m5-global-xgb-extra-id"]}  # earlier kernels whose outputs the job reads
 
 
 def main(job: str) -> None:

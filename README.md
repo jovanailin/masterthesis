@@ -11,15 +11,15 @@ evaluated on the M5 (Walmart) dataset.
 | `notebooks/02_data_preparation.ipynb` | Inputs of the direct forecasting models and their checks (Section 6.4) |
 | `notebooks/03_benchmarks.ipynb` | Classical benchmark methods, accuracy measures, validation scores (Sections 5.2, 5.3, 6.5, 7.1) |
 | `notebooks/04_global_xgboost.ipynb` | Global XGBoost: tuning, validation results of the global, partially global and recursive models (Sections 6.6, 7.1–7.4, 7.7) |
-| `notebooks/05_models_per_series.ipynb` | Models per series against global models on a sample of 100 series, with a check of the selection bias (Section 7.2) |
+| `notebooks/05_models_per_series.ipynb` | Models per series against global models on a sample of 1,000 series, with a check of the selection bias (Section 7.2) |
 | `notebooks/06_evaluation.ipynb` | Final evaluation on the test window: all models, hierarchy levels, demand classes, statistical tests, seeds (Sections 7.1–7.7, 7.9, 7.10) |
 | `notebooks/07_interpretation.ipynb` | Shapley values of the best global model: importance of the input groups and single inputs, dependence on the main inputs (Section 7.8) |
 | `src/m5_data.py` | Data loading, day indices of the train/validation/test split, the 12 M5 hierarchy levels |
 | `src/features.py` | Panel of sales, calendar and price inputs; origins and design matrices of the 7-day models (horizon as an input) |
-| `src/benchmarks.py` | Naive, seasonal naive, mean, Croston, SBA, TSB and ADIDA forecasts for all series |
+| `src/benchmarks.py` | Naive, seasonal naive, mean, simple exponential smoothing, Croston, SBA, TSB and ADIDA forecasts for all series, with per-series optimised smoothing constants for three of them |
 | `src/metrics.py` | RMSSE, WRMSSE over the 12 levels (checked against the official weights), MASE, bias |
 | `src/global_xgb.py` | Global XGBoost: variants, Hyperopt tuning on the validation window, refit for the test window; models per store and per demand class; recursive strategy (Sections 6.6, 7.2, 7.7) |
-| `src/local_xgb.py` | Models per series and a global model on a sample of 100 series: tuning, refit, selection-bias check (Sections 6.6, 7.2) |
+| `src/local_xgb.py` | Models per series and a global model on a sample of 1,000 series: tuning, refit, selection-bias check (Sections 6.6, 7.2) |
 | `src/evaluation.py` | Test-window forecasts of every model and the test evaluator (the only code that reads the test sales) |
 | `src/interpretation.py` | Shapley values (XGBoost TreeSHAP) of the global models on the test-window forecasts of 4,000 series |
 | `src/intermittency.py` | Demand statistics (zero share, ADI, CV²) and the Syntetos–Boylan–Croston classification |
@@ -28,7 +28,7 @@ evaluated on the M5 (Walmart) dataset.
 | `src/plot_style.py` | Shared style for the thesis figures |
 | `kaggle_jobs/` | Jobs that run as Kaggle GPU kernels; `upload_src.py` puts `src/` into a private Kaggle dataset for them |
 | `kaggle_jobs/speed_test/` | GPU speed test of the global XGBoost (results in `results/kaggle/speed_test/`) |
-| `kaggle_jobs/global_xgb/` | Kaggle kernels of the XGBoost models (`push.py <job>`): tuning and refit of the global variants (one kernel per loss), seeds, models per store and per demand class, recursive strategy |
+| `kaggle_jobs/global_xgb/` | Kaggle kernels of the XGBoost models (`push.py <job>`): tuning and refit of the global variants (one kernel per loss), seeds, models per store and per demand class, recursive strategy, retraining of the main models for three earlier evaluation windows (`backtest`) |
 | `figures/` | Figures used in the thesis (PNG and PDF) |
 | `results/` | Tables produced by the notebooks (CSV) |
 | `archive/replication/` | Abandoned replication of Tsantilis et al. (2025), kept for reference |
@@ -79,5 +79,5 @@ python -m nbconvert --to notebook --execute --inplace notebooks/02_data_preparat
 python -m nbconvert --to notebook --execute --inplace notebooks/03_benchmarks.ipynb
 ```
 
-The EDA notebook runs in about 1–2 minutes, the data preparation in about 3 and the benchmarks in about 2. The data preparation
+The EDA notebook runs in about 1–2 minutes, the data preparation in about 3 and the benchmarks in about 15. The data preparation
 saves the panel of inputs to `data/processed/panel/`, which the later notebooks load, so it must run before them.

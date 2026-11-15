@@ -28,6 +28,7 @@ import metrics as M
 
 RUNS = m5.PROCESSED_DIR / "global_xgb"
 OUT = m5.PROCESSED_DIR / "forecasts" / "test_forecasts.npz"
+BACKTEST_ORIGINS = (1885, 1857, 1829)  # earlier 28-day windows: d_1886-1913, d_1858-1885, d_1830-1857
 
 
 def test_panel() -> F.Panel:
@@ -94,7 +95,7 @@ def run() -> None:
                 out[f"{name}_{extra.stem.replace('model_test_', '')}"] = rows.matrix(_predict(_booster(extra), X))
         print(name, round(time.perf_counter() - start), "s", flush=True)
 
-    # models per series and the model of the sample: forecasts of the 100 series of the sample only
+    # models per series and the model of the sample: forecasts of the series of the sample only
     sample = pd.read_csv(L.RESULTS / "sample.csv")["row"].to_numpy()
     small = panel.subset(sample)
     srows = G.ForecastRows(small, "test")
@@ -109,7 +110,13 @@ def run() -> None:
                 pred[sel] = _predict(xgb.Booster(model_file=bytearray(raw)), srows.X.loc[sel, cols])
         else:
             pred = _predict(xgb.Booster(model_file=bytearray(model)), srows.X[cols])
-        out[f"sample100_{name}"] = srows.matrix(pred)
+        out[f"sample_{name}"] = srows.matrix(pred)
+    # classical methods on the earlier windows of the robustness check (the XGBoost models of these windows
+    # are trained by the Kaggle job "backtest")
+    for T in BACKTEST_ORIGINS:
+        for m, f in B.forecast_rolling(panel.y, T, m5.EVAL_WEEKS).items():
+            out[f"backtest_d{T}_benchmark_{m}"] = f.astype(np.float32)
+        print("benchmarks of the window after d_%d" % T, round(time.perf_counter() - start), "s", flush=True)
     np.savez(OUT, **out)
     print(len(out), "forecasts saved,", round((time.perf_counter() - start) / 60, 1), "min", flush=True)
 

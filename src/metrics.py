@@ -131,7 +131,9 @@ class Evaluator:
     def wrmsse(self, forecast: np.ndarray) -> pd.Series:
         """WRMSSE of each level (weighted RMSSE, weights summing to 1) and their mean, the M5 score."""
         r = self.rmsse(forecast)
-        by_level = pd.Series({lvl: float(np.sum(self.weight[lvl] * r[lvl])) for lvl in r}, name="WRMSSE")
+        # a series with no sales before the origin has no scale; its weight is zero, so it is left out
+        by_level = pd.Series({lvl: float(np.sum(np.where(self.weight[lvl] > 0, self.weight[lvl] * r[lvl], 0.0)))
+                              for lvl in r}, name="WRMSSE")
         by_level.index.name = "level"
         return pd.concat([pd.Series({"all": by_level.mean()}), by_level])
 

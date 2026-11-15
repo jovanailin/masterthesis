@@ -12,6 +12,8 @@ import sys
 from pathlib import Path
 
 INPUTS = ["L", "LE", "LES"]
+BACKTEST_MODELS = ["L_tweedie", "LE_tweedie", "LES_tweedie", "LESID_tweedie", "LES_mse", "LES_poisson",
+                   "LESID_tweedie_per_store", "LESID_tweedie_per_class", "LESID_tweedie_recursive"]
 JOBS = {
     "mse": {"variants": [[i, "mse"] for i in INPUTS], "budget_hours": 10.5},
     "poisson": {"variants": [[i, "poisson"] for i in INPUTS], "budget_hours": 10.5},
@@ -32,6 +34,9 @@ JOBS = {
     "store_cat_cpu": {"source": "LES_tweedie", "schemes": ["store_cat"], "device": "cpu"},
     "extra_id_cpu": {"source": "LESID_tweedie", "schemes": ["store", "store_cat", "class"], "recursive": True,
                      "device": "cpu"},
+    # earlier 28-day windows (ending d_1913, d_1885, d_1857), the main models retrained with fixed hyperparameters
+    "backtest": {"origins": [1885, 1857, 1829], "models": BACKTEST_MODELS},
+    "backtest_local": {"origins": [1885], "models": BACKTEST_MODELS, "series_step": 100, "device": "cpu"},
     # quick checks of the code: a few short trials
     "smoke": {"variants": [["L", "mse"], ["LESID", "tweedie"]], "budget_hours": 0.5, "max_evals": 2, "max_rounds": 30,
               "patience": 5},
@@ -71,7 +76,14 @@ if __name__ == "__main__":
         assert hits, f"the tuned variant {name} was not found"
         job["seed_candidate_dirs"].append(str(Path(hits[0]).parent))
     print("job", JOB, job, flush=True)
-    if "source" in job:
+    if "origins" in job:
+        job["model_dirs"] = {}
+        for name in job["models"]:
+            hits = sorted(glob.glob(TUNED.format(name), recursive=True))
+            assert hits, f"the tuned variant {name} was not found"
+            job["model_dirs"][name] = str(Path(hits[-1]).parent)
+        global_xgb.run_backtest(job, WORK)
+    elif "source" in job:
         hits = sorted(glob.glob(TUNED.format(job["source"]), recursive=True))
         assert hits, f"the tuned variant {job['source']} was not found"
         job["source_dir"] = str(Path(hits[0]).parent)

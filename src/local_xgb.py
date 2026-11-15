@@ -1,17 +1,17 @@
 """Models per series and a global model on the same sample of series (Sections 6.6, 7.2).
 
-Sample. 100 series, 25 from each Syntetos-Boylan class (training window), drawn at random among the series
+Sample. 1,000 series, 250 from each Syntetos-Boylan class (training window), drawn at random among the series
 with at least MIN_HISTORY days since their first sale.
 
 Models, all with the Tweedie loss (the loss chosen for the global model):
-  per series   one model per series and input set (L, L+E, L+E+S): 300 models;
-  sample       one model for the 100 series per input set (L, L+E, L+E+S, L+E+S+ID): 4 models.
+  per series   one model per series and input set (L, L+E, L+E+S): 3,000 models;
+  sample       one model for the 1,000 series per input set (L, L+E, L+E+S, L+E+S+ID): 4 models.
 
 Both are trained on the weekly origins up to d_1913 with all 7 horizons of each origin (the sample is small,
 so the horizons are not thinned as in the global model on all series) and tuned as the global model:
 Hyperopt (TPE), 30 trials, early stopping on the validation RMSE. A model per series minimises the RMSE of
 its series on the validation window (which is its RMSSE up to a constant); the model of the sample
-minimises the mean RMSSE of the 100 series. The best trial is refitted on targets up to d_1941 for the
+minimises the mean RMSSE of the 1,000 series. The best trial is refitted on targets up to d_1941 for the
 final evaluation.
 
 The search space is that of the global model, except for the models per series, which have about 1,900
@@ -43,7 +43,7 @@ import m5_data as m5
 import metrics as M
 
 LOSS = "tweedie"
-PER_CLASS = 25
+PER_CLASS = 250
 MIN_HISTORY = 365
 SAMPLE_SEED = 0
 SERIES_INPUTS = ["L", "LE", "LES"]
@@ -124,10 +124,10 @@ class Data:
         return out[0], out[1], (self.val.X.loc[v, cols], self.val.y[v])
 
 
-def one_series(data: Data, i: int, inputs: str, max_evals: int, max_rounds: int, select_days: int | None = None) -> dict:
+def one_series(rows: tuple, i: int, inputs: str, max_evals: int, max_rounds: int, select_days: int | None = None) -> dict:
     """Tune the model of series i. With `select_days`, the trial and the number of rounds are chosen on the first
     `select_days` days of the validation window only (check of the selection bias); no refit is made then."""
-    (Xtr, ytr), (Xte, yte), (Xv, yv) = data.series_rows(i, inputs)
+    (Xtr, ytr), (Xte, yte), (Xv, yv) = rows  # of this series only, so that little is sent to the worker
     t = time.perf_counter()
     k = select_days or len(yv)
     best, log = tune(Xtr, ytr, Xv.iloc[:k], yv[:k], lambda f: np.sqrt(np.mean((f - yv[:k]) ** 2)), series_space(),
@@ -161,7 +161,7 @@ def run(quick: bool = False, holdout: bool = False) -> None:
     print("data", {s: len(v[1]) for s, v in data.train.items()}, round(time.perf_counter() - start, 1), "s", flush=True)
 
     if holdout:  # models per series chosen on the first two weeks of the validation window only
-        done = Parallel(n_jobs=-1, verbose=5)(delayed(one_series)(data, i, inputs, max_evals, max_rounds, 2 * F.HORIZON)
+        done = Parallel(n_jobs=-1, verbose=5)(delayed(one_series)(data.series_rows(i, inputs), i, inputs, max_evals, max_rounds, 2 * F.HORIZON)
                                               for inputs in SERIES_INPUTS for i in range(data.n))
         np.savez(out / "valid_forecasts_first_half.npz", **{
             f"per_series_{inputs}": np.stack([d["forecast"] for d in sorted((d for d in done if d["inputs"] == inputs),
@@ -171,7 +171,7 @@ def run(quick: bool = False, holdout: bool = False) -> None:
 
     # ---- one model per series
     tasks = [(i, inputs) for inputs in SERIES_INPUTS for i in range(data.n)]
-    done = Parallel(n_jobs=-1, verbose=5)(delayed(one_series)(data, i, inputs, max_evals, max_rounds) for i, inputs in tasks)
+    done = Parallel(n_jobs=-1, verbose=5)(delayed(one_series)(data.series_rows(i, inputs), i, inputs, max_evals, max_rounds) for i, inputs in tasks)
     forecasts, models, table, trials = {}, {}, [], []
     for inputs in SERIES_INPUTS:
         part = sorted((d for d in done if d["inputs"] == inputs), key=lambda d: d["series"])
@@ -183,7 +183,7 @@ def run(quick: bool = False, holdout: bool = False) -> None:
                           **{k: v for k, v in b.items() if k not in ("params", "score")}, "seconds": d["seconds"]})
             trials += [{"id": sample["id"][d["series"]], "inputs": inputs, **t} for t in d["trials"]]
     pd.DataFrame(table).to_csv(results / "per_series_best.csv", index=False)
-    pd.DataFrame(trials).to_csv(results / "per_series_trials.csv", index=False, float_format="%.5g")
+    pd.DataFrame(trials).to_csv(results / "per_series_trials.csv.gz", index=False, float_format="%.5g")
     print("per series done", round((time.perf_counter() - start) / 60, 1), "min", flush=True)
 
     # ---- one model for the sample

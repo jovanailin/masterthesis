@@ -416,3 +416,75 @@ def run_extra(job: dict, work: Path) -> None:
         recursive_valid(panel, ev, best, out, device, **stop)
         recursive_refit(panel, out, device)
     _log(step="done", hours=round((time.perf_counter() - start) / 3600, 2))
+
+
+# --------------------------------------------------------------------------- earlier evaluation windows
+
+
+def run_backtest(job: dict, work: Path) -> None:
+    """Forecasts of earlier 28-day windows, as a check that the results do not depend on one test window.
+
+    For each origin T in job["origins"] every model in job["model_dirs"] is trained again on targets up to T
+    with the hyperparameters and the number of rounds of its tuned version (nothing is tuned again) and
+    forecasts d_T+1 - d_T+28 from 4 weekly origins, as on the validation and test windows. The
+    hyperparameters were chosen with later data than these windows; the forecasts themselves use only data
+    up to their origin.
+    """
+    start = time.perf_counter()
+    device = job.get("device", "cuda")
+    panel = F.build_panel()
+    if job.get("series_step"):
+        panel = panel.subset(np.arange(0, len(panel.ids), job["series_step"]))
+    labels = {}
+    for T in job["origins"]:
+        stage = f"d{T}"
+        F.STAGES[stage] = T
+        out = work / stage
+        out.mkdir(parents=True, exist_ok=True)
+        val = ForecastRows(panel, stage)
+        table = F.origin_table(panel, *F.training_origins(panel, stage))
+        recursive = []
+        for name, folder in job["model_dirs"].items():
+            best = json.loads((Path(folder) / "best.json").read_text())
+            groups, params = INPUT_SETS[best["inputs"]], best["params"] | {"device": device}
+            t = time.perf_counter()
+            if name.endswith("_recursive"):
+                recursive.append((name, best))
+                continue
+            if "scheme" in best:
+                if best["scheme"] not in labels:
+                    labels[best["scheme"]] = series_groups(panel, best["scheme"], None if not job.get("series_step") else
+                                                           np.arange(0, 30490, job["series_step"]))
+                lab = labels[best["scheme"]]
+                rows, h = F.horizon_rows(len(table), PER_ORIGIN, best["seed"])
+                pred = np.zeros(len(val.series), dtype=np.float32)
+                for g in best["groups"]:
+                    member = lab == g["group"]
+                    if not member.any():
+                        continue
+                    sel = member[table.series[rows]]
+                    X, y, _ = F.design(panel, table, h[sel], groups, stage=stage, rows=rows[sel])
+                    dtrain = xgb.QuantileDMatrix(X, y, max_bin=MAX_BIN, enable_categorical=True)
+                    vsel = member[val.series]
+                    dval = xgb.QuantileDMatrix(val.inputs(groups)[vsel], ref=dtrain, enable_categorical=True)
+                    pred[vsel] = xgb.train(params, dtrain, g["rounds"]).predict(dval)
+            else:
+                dtrain = training_matrix(panel, table, groups, stage, best["seed"])
+                dval = xgb.QuantileDMatrix(val.inputs(groups), ref=dtrain, enable_categorical=True)
+                pred = xgb.train(params, dtrain, best["rounds"]).predict(dval)
+                del dtrain
+            np.save(out / f"{name}.npy", val.matrix(pred))
+            _log(step="backtest", origin=T, model=name, seconds=round(time.perf_counter() - t, 1))
+        del table
+        for name, best in recursive:
+            t = time.perf_counter()
+            groups = INPUT_SETS[best["inputs"]]
+            X, y, _ = F.design(panel, one_step_table(panel, stage, best["seed"]), 1, groups, stage=stage)
+            dtrain = xgb.QuantileDMatrix(X, y, max_bin=MAX_BIN, enable_categorical=True)
+            del X
+            bst = xgb.train(best["params"] | {"device": device}, dtrain, best["rounds"])
+            del dtrain
+            np.save(out / f"{name}.npy", recursive_forecast(panel, bst, groups, stage))
+            _log(step="backtest", origin=T, model=name, seconds=round(time.perf_counter() - t, 1))
+    _log(step="done", hours=round((time.perf_counter() - start) / 3600, 2))
+

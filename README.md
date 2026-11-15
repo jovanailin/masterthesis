@@ -10,11 +10,14 @@ evaluated on the M5 (Walmart) dataset.
 | `notebooks/01_eda.ipynb` | Exploratory data analysis and demand classes (thesis Sections 6.2, 6.3) |
 | `notebooks/02_data_preparation.ipynb` | Inputs of the direct forecasting models and their checks (Section 6.4) |
 | `notebooks/03_benchmarks.ipynb` | Classical benchmark methods, accuracy measures, validation scores (Sections 5.2, 5.3, 6.5, 7.1) |
+| `notebooks/04_global_xgboost.ipynb` | Global XGBoost: tuning, validation results of the global, partially global and recursive models (Sections 6.6, 7.1–7.4, 7.7) |
+| `notebooks/05_models_per_series.ipynb` | Models per series against global models on a sample of 100 series, with a check of the selection bias (Section 7.2) |
 | `src/m5_data.py` | Data loading, day indices of the train/validation/test split, the 12 M5 hierarchy levels |
 | `src/features.py` | Panel of sales, calendar and price inputs; origins and design matrices of the 7-day models (horizon as an input) |
 | `src/benchmarks.py` | Naive, seasonal naive, mean, Croston, SBA, TSB and ADIDA forecasts for all series |
 | `src/metrics.py` | RMSSE, WRMSSE over the 12 levels (checked against the official weights), MASE, bias |
 | `src/global_xgb.py` | Global XGBoost: variants, Hyperopt tuning on the validation window, refit for the test window; models per store and per demand class; recursive strategy (Sections 6.6, 7.2, 7.7) |
+| `src/local_xgb.py` | Models per series and a global model on a sample of 100 series: tuning, refit, selection-bias check (Sections 6.6, 7.2) |
 | `src/intermittency.py` | Demand statistics (zero share, ADI, CV²) and the Syntetos–Boylan–Croston classification |
 | `src/series_sampling.py` | Stratified sample of series with a largest-remainder (Hamilton) allocation |
 | `src/factorial_stats.py` | Wilcoxon–Holm, Friedman–Nemenyi, critical difference diagram |

@@ -13,7 +13,8 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-KERNEL_SOURCES = {"final": ["m5-global-xgb-tweedie"], "extra": ["m5-global-xgb-tweedie"]}  # earlier kernels whose outputs the job reads
+KERNEL_SOURCES = {"final": ["m5-global-xgb-tweedie"], "extra": ["m5-global-xgb-tweedie"],
+                  "store_cat": ["m5-global-xgb-tweedie"], "extra_id": ["m5-global-xgb-final"]}  # earlier kernels whose outputs the job reads
 
 
 def main(job: str) -> None:

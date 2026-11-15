@@ -1,0 +1,74 @@
+{
+ "variant": "LES_tweedie_per_class",
+ "scheme": "class",
+ "inputs": "LES",
+ "loss": "tweedie",
+ "seed": 0,
+ "params": {
+  "tree_method": "hist",
+  "max_bin": 256,
+  "eval_metric": "rmse",
+  "objective": "reg:tweedie",
+  "colsample_bytree": 0.7793840301631207,
+  "learning_rate": 0.1488068356270708,
+  "max_depth": 11,
+  "min_child_weight": 159.55104131581516,
+  "reg_lambda": 18.179220487777087,
+  "subsample": 0.5892847643419175,
+  "tweedie_variance_power": 1.4078550499752776,
+  "device": "cuda",
+  "seed": 0
+ },
+ "hyperparameters_of": "LES_tweedie",
+ "groups": [
+  {
+   "group": "erratic",
+   "series": 874,
+   "rows": 413124,
+   "rounds": 28,
+   "valid_rmse": 4.704789075228899,
+   "seconds": 5.1
+  },
+  {
+   "group": "intermittent",
+   "series": 22161,
+   "rows": 9304161,
+   "rounds": 52,
+   "valid_rmse": 1.2019871085014695,
+   "seconds": 87.9
+  },
+  {
+   "group": "lumpy",
+   "series": 5534,
+   "rows": 2503991,
+   "rounds": 41,
+   "valid_rmse": 2.8376886292957217,
+   "seconds": 23.5
+  },
+  {
+   "group": "smooth",
+   "series": 1921,
+   "rows": 840505,
+   "rounds": 34,
+   "valid_rmse": 3.969753204603598,
+   "seconds": 9.1
+  }
+ ],
+ "wrmsse": 0.6407391846579632,
+ "mean_rmsse": 0.7420741381176061,
+ "wrmsse_by_level": {
+  "all": 0.6407391846579632,
+  "1": 0.4274160779542962,
+  "2": 0.5130734112216991,
+  "3": 0.617969683080991,
+  "4": 0.4835013172500746,
+  "5": 0.5774016854811418,
+  "6": 0.5821554585246896,
+  "7": 0.6532746002877888,
+  "8": 0.6688747426714943,
+  "9": 0.730256118820086,
+  "10": 0.8025390717899459,
+  "11": 0.8149427915858063,
+  "12": 0.8174652572275443
+ }
+}

@@ -21,8 +21,17 @@ JOBS = {
               "seed_candidates": ["LES_tweedie"]},
     # models per store and per demand class, and the recursive strategy, with the hyperparameters of L+E+S Tweedie
     "extra": {"source": "LES_tweedie", "schemes": ["store", "class"], "recursive": True},
-    "extra_local": {"source": "LES_tweedie", "schemes": ["store", "class"], "recursive": True, "max_rounds": 30,
+    "store_cat": {"source": "LES_tweedie", "schemes": ["store_cat"]},  # 30 models, one per store and category
+    # the same with the hyperparameters of the best variant, L+E+S+ID Tweedie
+    "extra_id": {"source": "LESID_tweedie", "schemes": ["store", "store_cat", "class"], "recursive": True},
+    "extra_id_local": {"source": "LESID_tweedie", "schemes": ["store", "store_cat", "class"], "recursive": True,
+                       "max_rounds": 30, "patience": 5, "series_step": 100, "device": "cpu"},
+    "extra_local": {"source": "LES_tweedie", "schemes": ["store", "store_cat", "class"], "recursive": True, "max_rounds": 30,
                     "patience": 5, "series_step": 100, "device": "cpu"},
+    # full runs on the local CPU, for when the Kaggle GPU queue does not move
+    "store_cat_cpu": {"source": "LES_tweedie", "schemes": ["store_cat"], "device": "cpu"},
+    "extra_id_cpu": {"source": "LESID_tweedie", "schemes": ["store", "store_cat", "class"], "recursive": True,
+                     "device": "cpu"},
     # quick checks of the code: a few short trials
     "smoke": {"variants": [["L", "mse"], ["LESID", "tweedie"]], "budget_hours": 0.5, "max_evals": 2, "max_rounds": 30,
               "patience": 5},

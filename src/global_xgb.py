@@ -254,9 +254,12 @@ def run(job: dict, work: Path) -> None:
 
 
 def series_groups(panel: F.Panel, scheme: str, rows: np.ndarray | None = None) -> np.ndarray:
-    """Group label of each series: its store, or its demand class (Syntetos-Boylan, training window)."""
+    """Group label of each series: its store, its store and category, or its demand class (Syntetos-Boylan,
+    training window)."""
     if scheme == "store":
         return panel.hier["store_id"].astype(str).to_numpy()
+    if scheme == "store_cat":
+        return (panel.hier["store_id"].astype(str) + "_" + panel.hier["cat_id"].astype(str)).to_numpy()
     sales = m5.load_sales(last_day=m5.TRAIN_END)
     if rows is not None:
         sales = sales.iloc[rows]
@@ -385,7 +388,7 @@ def recursive_refit(panel, out: Path, device: str) -> None:
 
 
 def run_extra(job: dict, work: Path) -> None:
-    """Models per store and per demand class, and the recursive strategy, with the hyperparameters of the
+    """Models per group of series (store, store x category, demand class) and the recursive strategy, with the hyperparameters of the
     tuned variant in job["source_dir"]."""
     start = time.perf_counter()
     device = job.get("device", "cuda")

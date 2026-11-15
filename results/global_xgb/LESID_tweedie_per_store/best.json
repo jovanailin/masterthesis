@@ -1,0 +1,122 @@
+{
+ "variant": "LESID_tweedie_per_store",
+ "scheme": "store",
+ "inputs": "LESID",
+ "loss": "tweedie",
+ "seed": 0,
+ "params": {
+  "tree_method": "hist",
+  "max_bin": 256,
+  "eval_metric": "rmse",
+  "objective": "reg:tweedie",
+  "colsample_bytree": 0.6550045959629933,
+  "learning_rate": 0.0833968469009031,
+  "max_depth": 9,
+  "min_child_weight": 128.35395679628192,
+  "reg_lambda": 0.25155214609378,
+  "subsample": 0.6862931457441849,
+  "tweedie_variance_power": 1.0622142844660774,
+  "device": "cuda",
+  "seed": 0
+ },
+ "hyperparameters_of": "LESID_tweedie",
+ "groups": [
+  {
+   "group": "CA_1",
+   "series": 3049,
+   "rows": 1335314,
+   "rounds": 46,
+   "valid_rmse": 2.0829686833961945,
+   "seconds": 14.6
+  },
+  {
+   "group": "CA_2",
+   "series": 3049,
+   "rows": 1212033,
+   "rounds": 99,
+   "valid_rmse": 1.9519633431983647,
+   "seconds": 14.6
+  },
+  {
+   "group": "CA_3",
+   "series": 3049,
+   "rows": 1326545,
+   "rounds": 77,
+   "valid_rmse": 2.439798281339174,
+   "seconds": 16.1
+  },
+  {
+   "group": "CA_4",
+   "series": 3049,
+   "rows": 1295164,
+   "rounds": 49,
+   "valid_rmse": 1.408875169647342,
+   "seconds": 12.9
+  },
+  {
+   "group": "TX_1",
+   "series": 3049,
+   "rows": 1337736,
+   "rounds": 101,
+   "valid_rmse": 1.6659359735382215,
+   "seconds": 15.9
+  },
+  {
+   "group": "TX_2",
+   "series": 3049,
+   "rows": 1340536,
+   "rounds": 50,
+   "valid_rmse": 1.823081169384805,
+   "seconds": 14.4
+  },
+  {
+   "group": "TX_3",
+   "series": 3049,
+   "rows": 1320389,
+   "rounds": 83,
+   "valid_rmse": 1.9123810449280507,
+   "seconds": 16.0
+  },
+  {
+   "group": "WI_1",
+   "series": 3049,
+   "rows": 1269887,
+   "rounds": 49,
+   "valid_rmse": 1.632076244430601,
+   "seconds": 13.0
+  },
+  {
+   "group": "WI_2",
+   "series": 3049,
+   "rows": 1293729,
+   "rounds": 90,
+   "valid_rmse": 2.8531256771813083,
+   "seconds": 15.9
+  },
+  {
+   "group": "WI_3",
+   "series": 3049,
+   "rows": 1330448,
+   "rounds": 115,
+   "valid_rmse": 1.9439561702634984,
+   "seconds": 17.3
+  }
+ ],
+ "wrmsse": 0.5854059667282429,
+ "mean_rmsse": 0.7413754570460199,
+ "wrmsse_by_level": {
+  "all": 0.5854059667282429,
+  "1": 0.4145901558855906,
+  "2": 0.45236298711923845,
+  "3": 0.5093860144797947,
+  "4": 0.4506380775309303,
+  "5": 0.5222721602976524,
+  "6": 0.5023043988032461,
+  "7": 0.5654128440299676,
+  "8": 0.5655480132579159,
+  "9": 0.6326307442072634,
+  "10": 0.7925266095040013,
+  "11": 0.8051146277978465,
+  "12": 0.8120849678254669
+ }
+}

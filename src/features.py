@@ -10,14 +10,17 @@ forecast is fed back into the model. Besides h, the inputs form four groups:
 - S, inputs derived from the sales history up to day t: rolling means, zero share, mean non-zero size,
   days since the last sale and the age of the series;
 - ID, hierarchy identifiers (item, department, category, store, state), kept apart from S so that the
-  effect of the series identity can be separated from that of the sales-derived inputs.
+  effect of the series identity can be separated from that of the sales-derived inputs;
+- H, sales of higher levels of the hierarchy up to day t: recent mean sales and trend of the item over all
+  stores, of the department in the store and of the whole store. They give the model the recent sales of
+  related series directly.
 
 Days before a series' first sale and Christmas Day (stores closed) are missing (NaN) in the sales
 history, so that they are not mistaken for zero demand. Rows whose target day is Christmas are dropped.
 
 Day numbers are 1-based, as in the M5 column names; arrays indexed by day have a dummy column 0.
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
@@ -41,7 +44,11 @@ S_COLS = [f"mean_{w}" for w in ROLL_WINDOWS] + ["zero_share_28", "zero_share_182
 E_COLS = ["wday", "event", "event_type", "days_to_event", "days_since_event", "snap",
           "rel_price", "price_change", "discount"]
 ID_COLS = ["item_id", "dept_id", "cat_id", "store_id", "state_id"]
-GROUPS = {"L": LAG_COLS, "E": E_COLS, "S": S_COLS, "ID": ID_COLS}
+# higher levels of the hierarchy whose recent sales are inputs of group H: name -> identifiers that define it
+HIER_LEVELS = {"item_all": ["item_id"], "dept_store": ["dept_id", "store_id"], "store": ["store_id"]}
+HIER_WINDOWS = (7, 28)
+HIER_COLS = [c for lvl in HIER_LEVELS for c in (*(f"{lvl}_mean_{w}" for w in HIER_WINDOWS), f"{lvl}_trend")]
+GROUPS = {"L": LAG_COLS, "E": E_COLS, "S": S_COLS, "ID": ID_COLS, "H": HIER_COLS}
 H_COL = "h"  # always an input, whatever the groups
 
 FEATURE_INFO = {
@@ -67,7 +74,12 @@ FEATURE_INFO = {
     "cat_id": ("ID", "category (3, categorical)"),
     "store_id": ("ID", "store (10, categorical)"),
     "state_id": ("ID", "state (3, categorical)"),
+    **{f"{lvl}_mean_{w}": ("H", f"mean daily sales of {what} over the last {w} days")
+       for lvl, what in [("item_all", "the item in all stores"), ("dept_store", "the department in the store"),
+                         ("store", "the whole store")] for w in HIER_WINDOWS},
+    **{f"{lvl}_trend": ("H", f"{lvl}_mean_{HIER_WINDOWS[0]} / {lvl}_mean_{HIER_WINDOWS[1]}") for lvl in HIER_LEVELS},
 }
+FEATURE_INFO = {c: FEATURE_INFO[c] for c in [H_COL, *(c for cols in GROUPS.values() for c in cols)]}
 
 
 def columns(groups) -> list[str]:
@@ -93,12 +105,32 @@ class Panel:
     state: np.ndarray  # (n,) row of `snap` for each series
     week: np.ndarray  # (TEST_END + 1,) week index of each day
     price: dict  # name -> (n, n_weeks) float32: rel_price, price_change, discount
+    # sales of the higher levels (group H), computed on first use; set to None after `y` is replaced
+    _agg: dict | None = field(default=None, init=False, repr=False)
 
     def subset(self, rows: np.ndarray) -> "Panel":
-        """The panel of the series in `rows` only."""
-        return Panel(ids=self.ids.iloc[rows].reset_index(drop=True), hier=self.hier.iloc[rows].reset_index(drop=True),
-                     y=self.y[rows], first_sale=self.first_sale[rows], cal=self.cal, snap=self.snap,
-                     state=self.state[rows], week=self.week, price={k: v[rows] for k, v in self.price.items()})
+        """The panel of the series in `rows` only. The sales of the higher levels stay those of all the
+        series of this panel."""
+        sub = Panel(ids=self.ids.iloc[rows].reset_index(drop=True), hier=self.hier.iloc[rows].reset_index(drop=True),
+                    y=self.y[rows], first_sale=self.first_sale[rows], cal=self.cal, snap=self.snap,
+                    state=self.state[rows], week=self.week, price={k: v[rows] for k, v in self.price.items()})
+        sub._agg = {lvl: (g[rows], cs, cnt) for lvl, (g, cs, cnt) in self.hier_sales().items()}
+        return sub
+
+    def hier_sales(self) -> dict:
+        """For each level of HIER_LEVELS: the group of each series, and per group the cumulative daily
+        sales and the cumulative number of days on which at least one of its series is observed."""
+        if self._agg is None:
+            filled, observed = np.nan_to_num(self.y).astype(np.float64), ~np.isnan(self.y)
+            self._agg = {}
+            for lvl, cols in HIER_LEVELS.items():
+                g = self.hier.groupby(cols, observed=True).ngroup().to_numpy()
+                total = np.zeros((g.max() + 1, self.y.shape[1]))
+                seen = np.zeros(total.shape, dtype=bool)
+                np.add.at(total, g, filled)
+                np.logical_or.at(seen, g, observed)
+                self._agg[lvl] = (g, np.cumsum(total, axis=1), np.cumsum(seen, axis=1, dtype=np.int32))
+        return self._agg
 
     def save(self, path: Path) -> None:
         path.mkdir(parents=True, exist_ok=True)
@@ -311,5 +343,16 @@ def design(panel: Panel, table: OriginTable, h, groups=("L", "E", "S", "ID"), ta
         parts.append(table.s.iloc[rows].reset_index(drop=True))
     if "ID" in groups:
         parts.append(panel.hier.iloc[i].reset_index(drop=True))
+    if "H" in groups:
+        t = table.t[rows].astype(np.int64)
+        hs = {}
+        with np.errstate(divide="ignore", invalid="ignore"):
+            for lvl, (g, cs, cnt) in panel.hier_sales().items():
+                gi = g[i]
+                for w in HIER_WINDOWS:
+                    lo = np.maximum(t - w, 0)
+                    hs[f"{lvl}_mean_{w}"] = (cs[gi, t] - cs[gi, lo]) / (cnt[gi, t] - cnt[gi, lo])
+                hs[f"{lvl}_trend"] = hs[f"{lvl}_mean_{HIER_WINDOWS[0]}"] / hs[f"{lvl}_mean_{HIER_WINDOWS[1]}"]
+        parts.append(pd.DataFrame(hs)[HIER_COLS].astype(np.float32))
     X = pd.concat(parts, axis=1)
     return X, (y[keep].astype(np.float32) if target else None), keep

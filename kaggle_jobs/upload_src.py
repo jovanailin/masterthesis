@@ -26,6 +26,9 @@ def main(message: str) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         for f in sorted((ROOT / "src").glob("*.py")):
             shutil.copy(f, tmp)
+        # tuned hyperparameters, for jobs that cannot read them from the output of the kernel that tuned them
+        for f in sorted((ROOT / "results" / "global_xgb").glob("*/best.json")):
+            shutil.copy(f, Path(tmp) / f"tuned_{f.parent.name}_best.json")
         meta = {"title": SLUG, "id": f"{user}/{SLUG}", "licenses": [{"name": "CC0-1.0"}],
                 "description": f"Code of the thesis (src/ at git {commit}, plus local changes if any)."}
         (Path(tmp) / "dataset-metadata.json").write_text(json.dumps(meta, indent=1))

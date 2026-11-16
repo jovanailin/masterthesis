@@ -28,6 +28,18 @@ HORIZON = 7  # days forecast from each origin
 # d_1927, d_1934; test d_1941, ..., d_1962). The models are not refitted between the origins, but their
 # inputs use the sales observed up to each origin.
 EVAL_WEEKS = 4
+FIRST_DATE = pd.Timestamp("2011-01-29")  # the date of d_1
+
+
+def date_of(day: int) -> str:
+    """Date of a 1-based day index, written as dd.mm.yyyy. (day 1 is 29.01.2011.)."""
+    return (FIRST_DATE + pd.Timedelta(days=int(day) - 1)).strftime("%d.%m.%Y.")
+
+
+def window_name(first: int, last: int) -> str:
+    """The days first..last as dates, e.g. 25.04.–22.05.2016. (the year once if both days are in the same year)."""
+    a, b = date_of(first), date_of(last)
+    return f"{a[:6]}–{b}" if a[6:] == b[6:] else f"{a}–{b}"
 
 # The 12 aggregation levels of the M5 hierarchy (42,840 series in total).
 LEVELS = {

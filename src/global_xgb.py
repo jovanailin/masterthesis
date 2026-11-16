@@ -37,7 +37,8 @@ import intermittency
 import m5_data as m5
 import metrics as M
 
-INPUT_SETS = {"L": ("L",), "LE": ("L", "E"), "LES": ("L", "E", "S"), "LESID": ("L", "E", "S", "ID")}
+INPUT_SETS = {"L": ("L",), "LE": ("L", "E"), "LES": ("L", "E", "S"), "LESID": ("L", "E", "S", "ID"),
+              "LESIDH": ("L", "E", "S", "ID", "H")}
 LOSSES = {
     "mse": {"objective": "reg:squarederror"},
     "poisson": {"objective": "count:poisson"},
@@ -89,7 +90,7 @@ class ForecastRows:
         rows, h = F.horizon_rows(len(table))
         self.n = len(panel.ids)
         self.series = s[rows]
-        self.X, _, _ = F.design(panel, table, h, target=False, rows=rows)
+        self.X, _, _ = F.design(panel, table, h, tuple(F.GROUPS), target=False, rows=rows)
         day = t[rows].astype(np.int64) + h
         self.y = panel.y[s[rows], day] if day.max() < panel.y.shape[1] else None
         # rows are ordered by origin, series, horizon; the forecast matrix is (series, day)

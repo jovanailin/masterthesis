@@ -7,6 +7,7 @@ Local check on 305 series and the CPU:  GLOBAL_XGB_JOB=smoke_local python kaggle
 """
 import glob
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -21,6 +22,10 @@ JOBS = {
     # L+E+S+ID with the best loss, then the best of the ten variants with four more seeds
     "final": {"variants": [["LESID", "tweedie"]], "budget_hours": 8, "seeds": [1, 2, 3, 4],
               "seed_candidates": ["LES_tweedie"]},
+    # L+E+S+ID with the sales of higher levels of the hierarchy (group H), tuned as the others, with four more seeds
+    "hier": {"variants": [["LESIDH", "tweedie"]], "budget_hours": 8, "seeds": [1, 2, 3, 4]},
+    "hier_local": {"variants": [["LESIDH", "tweedie"]], "budget_hours": 0.5, "max_evals": 2, "max_rounds": 30,
+                   "patience": 5, "series_step": 100, "device": "cpu", "seeds": [1]},
     # models per store and per demand class, and the recursive strategy, with the hyperparameters of L+E+S Tweedie
     "extra": {"source": "LES_tweedie", "schemes": ["store", "class"], "recursive": True},
     "store_cat": {"source": "LES_tweedie", "schemes": ["store_cat"]},  # 30 models, one per store and category
@@ -36,6 +41,7 @@ JOBS = {
                      "device": "cpu"},
     # earlier 28-day windows (ending d_1913, d_1885, d_1857), the main models retrained with fixed hyperparameters
     "backtest": {"origins": [1885, 1857, 1829], "models": BACKTEST_MODELS},
+    "backtest_hier": {"origins": [1885, 1857, 1829], "models": ["LESIDH_tweedie"]},
     "backtest_local": {"origins": [1885], "models": BACKTEST_MODELS, "series_step": 100, "device": "cpu"},
     # quick checks of the code: a few short trials
     "smoke": {"variants": [["L", "mse"], ["LESID", "tweedie"]], "budget_hours": 0.5, "max_evals": 2, "max_rounds": 30,
@@ -80,7 +86,12 @@ if __name__ == "__main__":
         job["model_dirs"] = {}
         for name in job["models"]:
             hits = sorted(glob.glob(TUNED.format(name), recursive=True))
-            assert hits, f"the tuned variant {name} was not found"
+            if not hits:  # the kernel that tuned it gave no output: best.json uploaded with the code (upload_src.py)
+                copies = sorted(glob.glob(f"/kaggle/input/**/tuned_{name}_best.json", recursive=True))
+                assert copies, f"the tuned variant {name} was not found"
+                (WORK / "tuned" / name).mkdir(parents=True, exist_ok=True)
+                shutil.copy(copies[0], WORK / "tuned" / name / "best.json")
+                hits = [str(WORK / "tuned" / name / "best.json")]
             job["model_dirs"][name] = str(Path(hits[-1]).parent)
         global_xgb.run_backtest(job, WORK)
     elif "source" in job:

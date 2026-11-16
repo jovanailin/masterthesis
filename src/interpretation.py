@@ -5,8 +5,8 @@ The models use the Tweedie loss with a log link, so the contributions are on the
 plus the contributions of a row add up to the logarithm of its forecast, and exp(contribution) is the factor
 by which an input multiplies the forecast.
 
-A random sample of series is explained (all their 28 forecast rows), for the best variant (L+E+S+ID) and for
-the same model without the identifiers (L+E+S).
+A random sample of series is explained (all their 28 forecast rows), for the best variant (L+E+S+ID+H), for
+the same model without the sales of the higher levels (L+E+S+ID) and without the identifiers (L+E+S).
 
 Run:  python src/interpretation.py      (CPU, about 10 minutes; writes data/processed/shap/)
 """
@@ -21,7 +21,7 @@ import m5_data as m5
 
 N_SERIES = 4000
 SEED = 0
-MODELS = {"LESID_tweedie": "final", "LES_tweedie": "tweedie"}  # variant -> folder of its kernel output
+MODELS = {"LESIDH_tweedie": "hier", "LESID_tweedie": "final", "LES_tweedie": "tweedie"}  # variant -> folder of its kernel output
 OUT = m5.PROCESSED_DIR / "shap"
 
 

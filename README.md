@@ -15,12 +15,12 @@ evaluated on the M5 (Walmart) dataset.
 | `notebooks/06_evaluation.ipynb` | Final evaluation on the test window: all models, hierarchy levels, demand classes, statistical tests, seeds (Sections 7.1–7.7, 7.9, 7.10) |
 | `notebooks/07_interpretation.ipynb` | Shapley values of the best global model: importance of the input groups and single inputs, dependence on the main inputs (Section 7.8) |
 | `src/m5_data.py` | Data loading, day indices of the train/validation/test split, the 12 M5 hierarchy levels |
-| `src/features.py` | Panel of sales, calendar and price inputs; origins and design matrices of the 7-day models (horizon as an input) |
+| `src/features.py` | Panel of sales, calendar and price inputs; origins and design matrices of the 7-day models (horizon as an input); input groups L, E, S, ID and H (sales of higher levels of the hierarchy) |
 | `src/benchmarks.py` | Naive, seasonal naive, mean, simple exponential smoothing, Croston, SBA, TSB and ADIDA forecasts for all series, with per-series optimised smoothing constants for three of them |
 | `src/metrics.py` | RMSSE, WRMSSE over the 12 levels (checked against the official weights), MASE, bias |
 | `src/global_xgb.py` | Global XGBoost: variants, Hyperopt tuning on the validation window, refit for the test window; models per store and per demand class; recursive strategy (Sections 6.6, 7.2, 7.7) |
 | `src/local_xgb.py` | Models per series and a global model on a sample of 1,000 series: tuning, refit, selection-bias check (Sections 6.6, 7.2) |
-| `src/evaluation.py` | Test-window forecasts of every model and the test evaluator (the only code that reads the test sales) |
+| `src/evaluation.py` | Test-window forecasts of every model and the test evaluator (the only code that reads the test sales); `--reuse-classical` skips the slow classical methods |
 | `src/interpretation.py` | Shapley values (XGBoost TreeSHAP) of the global models on the test-window forecasts of 4,000 series |
 | `src/intermittency.py` | Demand statistics (zero share, ADI, CV²) and the Syntetos–Boylan–Croston classification |
 | `src/series_sampling.py` | Stratified sample of series with a largest-remainder (Hamilton) allocation |
@@ -28,7 +28,7 @@ evaluated on the M5 (Walmart) dataset.
 | `src/plot_style.py` | Shared style for the thesis figures |
 | `kaggle_jobs/` | Jobs that run as Kaggle GPU kernels; `upload_src.py` puts `src/` into a private Kaggle dataset for them |
 | `kaggle_jobs/speed_test/` | GPU speed test of the global XGBoost (results in `results/kaggle/speed_test/`) |
-| `kaggle_jobs/global_xgb/` | Kaggle kernels of the XGBoost models (`push.py <job>`): tuning and refit of the global variants (one kernel per loss), seeds, models per store and per demand class, recursive strategy, retraining of the main models for three earlier evaluation windows (`backtest`) |
+| `kaggle_jobs/global_xgb/` | Kaggle kernels of the XGBoost models (`push.py <job>`): tuning and refit of the global variants (one kernel per loss), seeds, models per store and per demand class, recursive strategy, the variant with the sales of higher hierarchy levels (`hier`), retraining of the main models for three earlier evaluation windows (`backtest`, `backtest_hier`) |
 | `figures/` | Figures used in the thesis (PNG and PDF) |
 | `results/` | Tables produced by the notebooks (CSV) |
 | `archive/replication/` | Abandoned replication of Tsantilis et al. (2025), kept for reference |
@@ -58,11 +58,11 @@ redistribution.
    unzip data/raw/m5.zip -d data/raw
    ```
 
-| Window | Days | Dates | Use |
-|---|---|---|---|
-| Training | `d_1` – `d_1913` | 2011-01-29 – 2016-04-24 | model fitting, EDA |
-| Validation | `d_1914` – `d_1941` | 2016-04-25 – 2016-05-22 | tuning |
-| Test | `d_1942` – `d_1969` | 2016-05-23 – 2016-06-19 | final evaluation only |
+| Window | Dates | Use |
+|---|---|---|
+| Training | 29.01.2011. – 24.04.2016. | model fitting, EDA |
+| Validation | 25.04. – 22.05.2016. | tuning |
+| Test | 23.05. – 19.06.2016. | final evaluation only |
 
 Forecasts cover 7 days. Each 28-day window is forecast from 4 weekly origins (rolling evaluation): the models
 are not refitted between the origins, but their inputs use the sales observed up to each origin.

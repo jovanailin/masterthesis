@@ -1,6 +1,7 @@
-,L+E+S+ID · Tweedie,L+E+S · Tweedie
-horizon,0.08035802,0.09600012
-L: lags of sales,0.048175555,0.07644891
-E: known in advance,0.05146923,0.05511631
-S: statistics of sales,1.0208853,1.0863326
-ID: identifiers,0.10321087,
+,L+E+S · Tweedie,L+E+S+ID · Tweedie,L+E+S+ID+H · Tweedie
+horizon,0.09600012,0.08035802,0.08485013
+L: lags of sales,0.07644891,0.048175555,0.055486478
+E: known in advance,0.05511631,0.05146923,0.0571421
+S: statistics of sales,1.0863326,1.0208853,0.99888563
+ID: identifiers,,0.10321087,0.059764322
+H: sales of higher levels,,,0.10839856

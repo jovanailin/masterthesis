@@ -79,3 +79,12 @@ dept_id,ID,"department (7, categorical)"
 cat_id,ID,"category (3, categorical)"
 store_id,ID,"store (10, categorical)"
 state_id,ID,"state (3, categorical)"
+item_all_mean_7,H,mean daily sales of the item in all stores over the last 7 days
+item_all_mean_28,H,mean daily sales of the item in all stores over the last 28 days
+item_all_trend,H,item_all_mean_7 / item_all_mean_28
+dept_store_mean_7,H,mean daily sales of the department in the store over the last 7 days
+dept_store_mean_28,H,mean daily sales of the department in the store over the last 28 days
+dept_store_trend,H,dept_store_mean_7 / dept_store_mean_28
+store_mean_7,H,mean daily sales of the whole store over the last 7 days
+store_mean_28,H,mean daily sales of the whole store over the last 28 days
+store_trend,H,store_mean_7 / store_mean_28

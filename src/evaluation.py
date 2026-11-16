@@ -9,10 +9,13 @@ d_1948, d_1955, d_1962) without refitting; the later origins see the sales obser
 and the weights of the measures are those of the first origin (history up to d_1941, revenue of its last
 28 days), which are the official ones of the M5 evaluation.
 
-Run:  python src/evaluation.py      (CPU, a few minutes; writes data/processed/forecasts/test_forecasts.npz)
+Run:  python src/evaluation.py      (CPU, about an hour; writes data/processed/forecasts/test_forecasts.npz)
+      python src/evaluation.py --reuse-classical      (a few minutes: the forecasts of the classical methods,
+      which take most of the time, are taken from the existing file)
 """
 import json
 import pickle
+import sys
 import time
 
 import numpy as np
@@ -40,6 +43,7 @@ def test_panel() -> F.Panel:
     y[:, : m5.VALID_END + 1] = panel.y
     y[:, m5.VALID_END + 1 :] = test[m5.day_cols(m5.VALID_END + 1, m5.TEST_END)].to_numpy(np.float32)
     panel.y = y
+    panel._agg = None  # the sales of the higher levels are recomputed with the test sales
     return panel
 
 
@@ -65,13 +69,17 @@ def _predict(bst: xgb.Booster, X) -> np.ndarray:
     return bst.predict(xgb.DMatrix(X, enable_categorical=True))
 
 
-def run() -> None:
+def run(reuse_classical: bool = False) -> None:
     start = time.perf_counter()
     panel = test_panel()
     rows = G.ForecastRows(panel, "test")
     out = {}
+    if reuse_classical:
+        with np.load(OUT) as old:
+            out = {k: old[k] for k in old.files if k.startswith(("benchmark_", "backtest_"))}
+        assert all(f"benchmark_{m}" in out and f"backtest_d{T}_benchmark_{m}" in out for m in B.METHODS for T in BACKTEST_ORIGINS)
 
-    for m, f in B.forecast_rolling(panel.y, m5.VALID_END, m5.EVAL_WEEKS).items():
+    for m, f in ({} if reuse_classical else B.forecast_rolling(panel.y, m5.VALID_END, m5.EVAL_WEEKS)).items():
         out[f"benchmark_{m}"] = f.astype(np.float32)
     print("benchmarks", round(time.perf_counter() - start), "s", flush=True)
 
@@ -113,7 +121,7 @@ def run() -> None:
         out[f"sample_{name}"] = srows.matrix(pred)
     # classical methods on the earlier windows of the robustness check (the XGBoost models of these windows
     # are trained by the Kaggle job "backtest")
-    for T in BACKTEST_ORIGINS:
+    for T in () if reuse_classical else BACKTEST_ORIGINS:
         for m, f in B.forecast_rolling(panel.y, T, m5.EVAL_WEEKS).items():
             out[f"backtest_d{T}_benchmark_{m}"] = f.astype(np.float32)
         print("benchmarks of the window after d_%d" % T, round(time.perf_counter() - start), "s", flush=True)
@@ -122,4 +130,4 @@ def run() -> None:
 
 
 if __name__ == "__main__":
-    run()
+    run("--reuse-classical" in sys.argv)

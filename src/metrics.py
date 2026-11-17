@@ -1,9 +1,11 @@
 """Accuracy measures of the 7-day forecasts (thesis Sections 5.2 and 5.3).
 
 RMSSE and MASE divide the forecast error of a series by the in-sample error of the one-step naive forecast on
-its own history, from its first non-zero sale to the forecast origin (the M5 convention). WRMSSE, the official
-M5 measure, averages the RMSSE of all 42,840 series of the 12 hierarchy levels: within a level each series is
-weighted by its dollar sales in the 28 days up to the forecast origin, and the 12 levels count equally.
+its own history, from its first non-zero sale to the forecast origin (the M5 convention). WRMSSE averages the
+RMSSE of the series of 7 hierarchy levels (m5_data.EVAL_LEVELS: total, state, store, category, store ×
+category, item, item × store; 33,586 series): within a level each series is weighted by its dollar sales in
+the 28 days up to the forecast origin, and the levels count equally. The official M5 measure is the same over
+all 12 levels of the M5 hierarchy; the weights of the 7 levels are the official ones.
 
 The official M5 score is computed on one 28-day forecast. Here the same 28 days are forecast 7 days at a
 time from 4 weekly origins, and the measure is computed on these 28 days with the official scales and
@@ -31,6 +33,7 @@ LEVEL_KEYS = {
     11: ["state_id", "item_id"],
     12: ["item_id", "store_id"],
 }
+LEVEL_KEYS = {lvl: cols for lvl, cols in LEVEL_KEYS.items() if lvl in m5.EVAL_LEVELS}
 
 
 def level_matrices(hier: pd.DataFrame) -> dict:
@@ -129,7 +132,7 @@ class Evaluator:
         return out
 
     def wrmsse(self, forecast: np.ndarray) -> pd.Series:
-        """WRMSSE of each level (weighted RMSSE, weights summing to 1) and their mean, the M5 score."""
+        """WRMSSE of each level (weighted RMSSE, weights summing to 1) and their mean over the levels."""
         r = self.rmsse(forecast)
         # a series with no sales before the origin has no scale; its weight is zero, so it is left out
         by_level = pd.Series({lvl: float(np.sum(np.where(self.weight[lvl] > 0, self.weight[lvl] * r[lvl], 0.0)))

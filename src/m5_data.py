@@ -57,6 +57,10 @@ LEVELS = {
     12: ["item_id", "store_id"],
 }
 
+# The levels used in this thesis for WRMSSE: the M5 hierarchy without department, state × category,
+# state × department, store × department and item × state (33,586 series). The keys keep the M5 numbers.
+EVAL_LEVELS = (1, 2, 3, 4, 8, 10, 12)
+
 
 def day_cols(start: int = 1, end: int = TRAIN_END) -> list[str]:
     return [f"d_{i}" for i in range(start, end + 1)]

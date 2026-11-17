@@ -17,7 +17,7 @@ evaluated on the M5 (Walmart) dataset.
 | `src/m5_data.py` | Data loading, day indices of the train/validation/test split, the 12 M5 hierarchy levels |
 | `src/features.py` | Panel of sales, calendar and price inputs; origins and design matrices of the 7-day models (horizon as an input); input groups L, E, S, ID and H (sales of higher levels of the hierarchy) |
 | `src/benchmarks.py` | Naive, seasonal naive, mean, simple exponential smoothing, Croston, SBA, TSB and ADIDA forecasts for all series, with per-series optimised smoothing constants for three of them |
-| `src/metrics.py` | RMSSE, WRMSSE over the 12 levels (checked against the official weights), MASE, bias |
+| `src/metrics.py` | RMSSE, WRMSSE over 7 hierarchy levels (official M5 weights, checked against the official files), MASE, bias |
 | `src/global_xgb.py` | Global XGBoost: variants, Hyperopt tuning on the validation window, refit for the test window; models per store and per demand class; recursive strategy (Sections 6.6, 7.2, 7.7) |
 | `src/local_xgb.py` | Models per series and a global model on a sample of 1,000 series: tuning, refit, selection-bias check (Sections 6.6, 7.2) |
 | `src/evaluation.py` | Test-window forecasts of every model and the test evaluator (the only code that reads the test sales); `--reuse-classical` skips the slow classical methods |

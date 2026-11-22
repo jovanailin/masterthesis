@@ -17,7 +17,8 @@ KERNEL_SOURCES = {"final": ["m5-global-xgb-tweedie"], "extra": ["m5-global-xgb-t
                   "store_cat": ["m5-global-xgb-tweedie"], "extra_id": ["m5-global-xgb-final"],
                   "backtest": ["m5-global-xgb-mse", "m5-global-xgb-poisson", "m5-global-xgb-tweedie", "m5-global-xgb-final",
                                "m5-global-xgb-extra-id"],
-                  "backtest_hier": ["m5-global-xgb-hier"]}  # earlier kernels whose outputs the job reads
+                  "backtest_hier": ["m5-global-xgb-hier"], "hier_seeds12": ["m5-global-xgb-hier"],
+                  "hier_seeds34": ["m5-global-xgb-hier"]}  # earlier kernels whose outputs the job reads
 
 
 def main(job: str) -> None:

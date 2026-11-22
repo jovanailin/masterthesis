@@ -23,7 +23,11 @@ JOBS = {
     "final": {"variants": [["LESID", "tweedie"]], "budget_hours": 8, "seeds": [1, 2, 3, 4],
               "seed_candidates": ["LES_tweedie"]},
     # L+E+S+ID with the sales of higher levels of the hierarchy (group H), tuned as the others, with four more seeds
-    "hier": {"variants": [["LESIDH", "tweedie"]], "budget_hours": 8, "seeds": [1, 2, 3, 4]},
+    # (the kernel ran out of memory on the third test refit, so the test models of the seeds have kernels of their own)
+    "hier": {"variants": [["LESIDH", "tweedie"]], "budget_hours": 8, "seeds": [1, 2, 3, 4], "seed_refits": False},
+    "hier_seeds12": {"refit_of": "LESIDH_tweedie", "seeds": [1, 2]},
+    "hier_seeds34": {"refit_of": "LESIDH_tweedie", "seeds": [3, 4]},
+    "hier_seeds_local": {"refit_of": "LESIDH_tweedie", "seeds": [1], "device": "cpu", "series_step": 100},
     "hier_local": {"variants": [["LESIDH", "tweedie"]], "budget_hours": 0.5, "max_evals": 2, "max_rounds": 30,
                    "patience": 5, "series_step": 100, "device": "cpu", "seeds": [1]},
     # models per store and per demand class, and the recursive strategy, with the hyperparameters of L+E+S Tweedie
@@ -94,6 +98,11 @@ if __name__ == "__main__":
                 hits = [str(WORK / "tuned" / name / "best.json")]
             job["model_dirs"][name] = str(Path(hits[-1]).parent)
         global_xgb.run_backtest(job, WORK)
+    elif "refit_of" in job:
+        hits = sorted(glob.glob(TUNED.format(job["refit_of"]), recursive=True))
+        assert hits, f"the tuned variant {job['refit_of']} was not found"
+        job["source_dir"] = str(Path(hits[0]).parent)
+        global_xgb.run_seed_refits(job, WORK)
     elif "source" in job:
         hits = sorted(glob.glob(TUNED.format(job["source"]), recursive=True))
         assert hits, f"the tuned variant {job['source']} was not found"

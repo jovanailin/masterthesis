@@ -27,7 +27,7 @@
    "rows": 630380,
    "rounds": 65,
    "valid_rmse": 2.517299957717447,
-   "seconds": 8.3
+   "seconds": 8.5
   },
   {
    "group": "CA_1_HOBBIES",
@@ -43,7 +43,7 @@
    "rows": 457074,
    "rounds": 36,
    "valid_rmse": 1.259873695968258,
-   "seconds": 4.9
+   "seconds": 5.2
   },
   {
    "group": "CA_2_FOODS",
@@ -51,7 +51,7 @@
    "rows": 511312,
    "rounds": 53,
    "valid_rmse": 2.373638554133889,
-   "seconds": 5.8
+   "seconds": 6.0
   },
   {
    "group": "CA_2_HOBBIES",
@@ -59,7 +59,7 @@
    "rows": 246971,
    "rounds": 57,
    "valid_rmse": 1.7100717230841302,
-   "seconds": 3.3
+   "seconds": 3.4
   },
   {
    "group": "CA_2_HOUSEHOLD",
@@ -67,7 +67,7 @@
    "rows": 453750,
    "rounds": 66,
    "valid_rmse": 1.4044483507839407,
-   "seconds": 5.7
+   "seconds": 5.9
   },
   {
    "group": "CA_3_FOODS",
@@ -75,7 +75,7 @@
    "rows": 629901,
    "rounds": 51,
    "valid_rmse": 2.7930340231572415,
-   "seconds": 8.0
+   "seconds": 8.1
   },
   {
    "group": "CA_3_HOBBIES",
@@ -83,7 +83,7 @@
    "rows": 246844,
    "rounds": 30,
    "valid_rmse": 2.1851037748636917,
-   "seconds": 2.9
+   "seconds": 3.0
   },
   {
    "group": "CA_3_HOUSEHOLD",
@@ -99,7 +99,7 @@
    "rows": 618403,
    "rounds": 49,
    "valid_rmse": 1.6080158881056148,
-   "seconds": 7.2
+   "seconds": 6.9
   },
   {
    "group": "CA_4_HOBBIES",
@@ -107,7 +107,7 @@
    "rows": 231039,
    "rounds": 36,
    "valid_rmse": 1.6409655284887363,
-   "seconds": 2.7
+   "seconds": 2.9
   },
   {
    "group": "CA_4_HOUSEHOLD",
@@ -115,7 +115,7 @@
    "rows": 445722,
    "rounds": 93,
    "valid_rmse": 0.8909286946159435,
-   "seconds": 6.2
+   "seconds": 6.3
   },
   {
    "group": "TX_1_FOODS",
@@ -123,7 +123,7 @@
    "rows": 634369,
    "rounds": 103,
    "valid_rmse": 1.9647435101668271,
-   "seconds": 9.5
+   "seconds": 9.6
   },
   {
    "group": "TX_1_HOBBIES",
@@ -131,7 +131,7 @@
    "rows": 246135,
    "rounds": 24,
    "valid_rmse": 1.3914069544022463,
-   "seconds": 2.8
+   "seconds": 2.7
   },
   {
    "group": "TX_1_HOUSEHOLD",
@@ -139,7 +139,7 @@
    "rows": 457232,
    "rounds": 70,
    "valid_rmse": 1.2939200191558573,
-   "seconds": 6.0
+   "seconds": 5.9
   },
   {
    "group": "TX_2_FOODS",
@@ -147,7 +147,7 @@
    "rows": 635000,
    "rounds": 50,
    "valid_rmse": 2.2144329469976336,
-   "seconds": 7.7
+   "seconds": 7.8
   },
   {
    "group": "TX_2_HOBBIES",
@@ -163,7 +163,7 @@
    "rows": 458299,
    "rounds": 76,
    "valid_rmse": 1.3221519365812444,
-   "seconds": 6.1
+   "seconds": 6.2
   },
   {
    "group": "TX_3_FOODS",
@@ -187,7 +187,7 @@
    "rows": 455245,
    "rounds": 71,
    "valid_rmse": 1.303715825235439,
-   "seconds": 6.0
+   "seconds": 6.1
   },
   {
    "group": "WI_1_FOODS",
@@ -195,7 +195,7 @@
    "rows": 568096,
    "rounds": 67,
    "valid_rmse": 2.004444180962242,
-   "seconds": 6.9
+   "seconds": 7.0
   },
   {
    "group": "WI_1_HOBBIES",
@@ -211,7 +211,7 @@
    "rows": 454698,
    "rounds": 99,
    "valid_rmse": 1.047771394107454,
-   "seconds": 6.7
+   "seconds": 6.8
   },
   {
    "group": "WI_2_FOODS",
@@ -219,7 +219,7 @@
    "rows": 596709,
    "rounds": 51,
    "valid_rmse": 3.865755834463914,
-   "seconds": 7.3
+   "seconds": 7.4
   },
   {
    "group": "WI_2_HOBBIES",
@@ -227,7 +227,7 @@
    "rows": 245818,
    "rounds": 34,
    "valid_rmse": 1.2701536820453632,
-   "seconds": 2.6
+   "seconds": 2.7
   },
   {
    "group": "WI_2_HOUSEHOLD",
@@ -235,7 +235,7 @@
    "rows": 451202,
    "rounds": 55,
    "valid_rmse": 1.5351736065979615,
-   "seconds": 5.6
+   "seconds": 5.7
   },
   {
    "group": "WI_3_FOODS",
@@ -243,7 +243,7 @@
    "rows": 628141,
    "rounds": 49,
    "valid_rmse": 2.5349354291586255,
-   "seconds": 7.6
+   "seconds": 7.8
   },
   {
    "group": "WI_3_HOBBIES",
@@ -251,7 +251,7 @@
    "rows": 247356,
    "rounds": 43,
    "valid_rmse": 1.292142164895812,
-   "seconds": 2.9
+   "seconds": 3.0
   },
   {
    "group": "WI_3_HOUSEHOLD",
@@ -259,24 +259,19 @@
    "rows": 454951,
    "rounds": 62,
    "valid_rmse": 1.2005431226214862,
-   "seconds": 5.7
+   "seconds": 6.0
   }
  ],
- "wrmsse": 0.6062046354203622,
+ "wrmsse": 0.5949278349887459,
  "mean_rmsse": 0.742920640285047,
  "wrmsse_by_level": {
-  "all": 0.6062046354203622,
+  "all": 0.5949278349887459,
   "1": 0.4509576765737193,
   "2": 0.48251870734671043,
   "3": 0.5481900662578496,
   "4": 0.4774565776713921,
-  "5": 0.5460706863677076,
-  "6": 0.5213865466287663,
-  "7": 0.5830027028103534,
   "8": 0.5908138903032549,
-  "9": 0.6495753447076639,
   "10": 0.800092868777971,
-  "11": 0.8099254996086341,
   "12": 0.8144650579903235
  }
 }

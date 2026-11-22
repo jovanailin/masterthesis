@@ -9,13 +9,13 @@
   "max_bin": 256,
   "eval_metric": "rmse",
   "objective": "reg:tweedie",
-  "colsample_bytree": 0.7793840301631207,
-  "learning_rate": 0.1488068356270708,
-  "max_depth": 11,
-  "min_child_weight": 159.55104131581516,
-  "reg_lambda": 18.179220487777087,
-  "subsample": 0.5892847643419175,
-  "tweedie_variance_power": 1.4078550499752776,
+  "colsample_bytree": 0.6400837751455177,
+  "learning_rate": 0.14016643676030155,
+  "max_depth": 10,
+  "min_child_weight": 1.7267325890185086,
+  "reg_lambda": 17.714140198509735,
+  "subsample": 0.7009155592789973,
+  "tweedie_variance_power": 1.2631398984214708,
   "device": "cuda",
   "seed": 0
  },
@@ -25,258 +25,253 @@
    "group": "CA_1_FOODS",
    "series": 1437,
    "rows": 630380,
-   "rounds": 46,
-   "valid_rmse": 2.506839778633013,
-   "seconds": 7.5
+   "rounds": 55,
+   "valid_rmse": 2.524275882721099,
+   "seconds": 9.8
   },
   {
    "group": "CA_1_HOBBIES",
    "series": 565,
    "rows": 247860,
    "rounds": 28,
-   "valid_rmse": 2.184271771822296,
-   "seconds": 2.6
+   "valid_rmse": 2.181422612062824,
+   "seconds": 3.6
   },
   {
    "group": "CA_1_HOUSEHOLD",
    "series": 1047,
    "rows": 457074,
-   "rounds": 38,
-   "valid_rmse": 1.2579619469525511,
-   "seconds": 4.4
+   "rounds": 36,
+   "valid_rmse": 1.2714893954211242,
+   "seconds": 5.4
   },
   {
    "group": "CA_2_FOODS",
    "series": 1437,
    "rows": 511312,
-   "rounds": 45,
-   "valid_rmse": 2.3556587081373443,
-   "seconds": 5.2
+   "rounds": 47,
+   "valid_rmse": 2.4089504052673076,
+   "seconds": 6.5
   },
   {
    "group": "CA_2_HOBBIES",
    "series": 565,
    "rows": 246971,
-   "rounds": 28,
-   "valid_rmse": 1.729958990740617,
-   "seconds": 2.4
+   "rounds": 27,
+   "valid_rmse": 1.7490397780591866,
+   "seconds": 3.3
   },
   {
    "group": "CA_2_HOUSEHOLD",
    "series": 1047,
    "rows": 453750,
-   "rounds": 34,
-   "valid_rmse": 1.4049273911062388,
-   "seconds": 4.4
+   "rounds": 31,
+   "valid_rmse": 1.4064009317285247,
+   "seconds": 5.2
   },
   {
    "group": "CA_3_FOODS",
    "series": 1437,
    "rows": 629901,
    "rounds": 31,
-   "valid_rmse": 2.852274734262012,
-   "seconds": 6.6
+   "valid_rmse": 2.852225652594693,
+   "seconds": 8.1
   },
   {
    "group": "CA_3_HOBBIES",
    "series": 565,
    "rows": 246844,
-   "rounds": 34,
-   "valid_rmse": 2.158495435981136,
-   "seconds": 2.7
+   "rounds": 38,
+   "valid_rmse": 2.178971383676756,
+   "seconds": 3.7
   },
   {
    "group": "CA_3_HOUSEHOLD",
    "series": 1047,
    "rows": 449800,
-   "rounds": 24,
-   "valid_rmse": 1.9985046473627344,
-   "seconds": 4.2
+   "rounds": 25,
+   "valid_rmse": 2.0097826878522063,
+   "seconds": 5.3
   },
   {
    "group": "CA_4_FOODS",
    "series": 1437,
    "rows": 618403,
-   "rounds": 26,
-   "valid_rmse": 1.6185520246608682,
-   "seconds": 5.6
+   "rounds": 39,
+   "valid_rmse": 1.6162793818403636,
+   "seconds": 7.3
   },
   {
    "group": "CA_4_HOBBIES",
    "series": 565,
    "rows": 231039,
-   "rounds": 50,
-   "valid_rmse": 1.6488490728720917,
-   "seconds": 2.6
+   "rounds": 29,
+   "valid_rmse": 1.6488775228370571,
+   "seconds": 3.0
   },
   {
    "group": "CA_4_HOUSEHOLD",
    "series": 1047,
    "rows": 445722,
-   "rounds": 61,
-   "valid_rmse": 0.8921171586134772,
-   "seconds": 4.2
+   "rounds": 39,
+   "valid_rmse": 0.896048032940206,
+   "seconds": 4.7
   },
   {
    "group": "TX_1_FOODS",
    "series": 1437,
    "rows": 634369,
-   "rounds": 47,
-   "valid_rmse": 1.9671554861069531,
-   "seconds": 7.0
+   "rounds": 52,
+   "valid_rmse": 1.9798623230172268,
+   "seconds": 8.8
   },
   {
    "group": "TX_1_HOBBIES",
    "series": 565,
    "rows": 246135,
-   "rounds": 27,
-   "valid_rmse": 1.380541997426626,
-   "seconds": 2.3
+   "rounds": 21,
+   "valid_rmse": 1.3939849995426536,
+   "seconds": 3.0
   },
   {
    "group": "TX_1_HOUSEHOLD",
    "series": 1047,
    "rows": 457232,
-   "rounds": 31,
-   "valid_rmse": 1.286018826405916,
-   "seconds": 4.2
+   "rounds": 56,
+   "valid_rmse": 1.305401953417324,
+   "seconds": 6.0
   },
   {
    "group": "TX_2_FOODS",
    "series": 1437,
    "rows": 635000,
-   "rounds": 37,
-   "valid_rmse": 2.201257517493057,
-   "seconds": 6.6
+   "rounds": 32,
+   "valid_rmse": 2.2440836384327416,
+   "seconds": 7.9
   },
   {
    "group": "TX_2_HOBBIES",
    "series": 565,
    "rows": 247237,
-   "rounds": 54,
-   "valid_rmse": 1.5282897645781788,
-   "seconds": 2.8
+   "rounds": 40,
+   "valid_rmse": 1.5235355309258451,
+   "seconds": 3.6
   },
   {
    "group": "TX_2_HOUSEHOLD",
    "series": 1047,
    "rows": 458299,
-   "rounds": 33,
-   "valid_rmse": 1.30151347616345,
-   "seconds": 4.4
+   "rounds": 30,
+   "valid_rmse": 1.314370938718459,
+   "seconds": 5.2
   },
   {
    "group": "TX_3_FOODS",
    "series": 1437,
    "rows": 619668,
-   "rounds": 66,
-   "valid_rmse": 2.3997843589841215,
-   "seconds": 7.5
+   "rounds": 59,
+   "valid_rmse": 2.4399470137850723,
+   "seconds": 9.0
   },
   {
    "group": "TX_3_HOBBIES",
    "series": 565,
    "rows": 245476,
-   "rounds": 37,
-   "valid_rmse": 1.4219590935786253,
-   "seconds": 2.5
+   "rounds": 110,
+   "valid_rmse": 1.4495372426463076,
+   "seconds": 5.6
   },
   {
    "group": "TX_3_HOUSEHOLD",
    "series": 1047,
    "rows": 455245,
-   "rounds": 44,
-   "valid_rmse": 1.3098697660455094,
-   "seconds": 4.5
+   "rounds": 37,
+   "valid_rmse": 1.3218861930941879,
+   "seconds": 5.6
   },
   {
    "group": "WI_1_FOODS",
    "series": 1437,
    "rows": 568096,
-   "rounds": 38,
-   "valid_rmse": 2.0324567944853347,
-   "seconds": 5.5
+   "rounds": 29,
+   "valid_rmse": 2.0385719738598147,
+   "seconds": 6.4
   },
   {
    "group": "WI_1_HOBBIES",
    "series": 565,
    "rows": 247093,
    "rounds": 25,
-   "valid_rmse": 1.4305134651909415,
-   "seconds": 2.5
+   "valid_rmse": 1.4461671780262269,
+   "seconds": 3.2
   },
   {
    "group": "WI_1_HOUSEHOLD",
    "series": 1047,
    "rows": 454698,
-   "rounds": 45,
-   "valid_rmse": 1.0513477112916259,
-   "seconds": 4.2
+   "rounds": 53,
+   "valid_rmse": 1.0605084557505486,
+   "seconds": 5.6
   },
   {
    "group": "WI_2_FOODS",
    "series": 1437,
    "rows": 596709,
-   "rounds": 45,
-   "valid_rmse": 3.902676146917287,
-   "seconds": 6.6
+   "rounds": 29,
+   "valid_rmse": 3.9817302309292693,
+   "seconds": 7.3
   },
   {
    "group": "WI_2_HOBBIES",
    "series": 565,
    "rows": 245818,
-   "rounds": 23,
-   "valid_rmse": 1.2709176611269204,
-   "seconds": 2.3
+   "rounds": 22,
+   "valid_rmse": 1.2732795231979541,
+   "seconds": 2.8
   },
   {
    "group": "WI_2_HOUSEHOLD",
    "series": 1047,
    "rows": 451202,
-   "rounds": 41,
-   "valid_rmse": 1.535861690913389,
-   "seconds": 4.6
+   "rounds": 32,
+   "valid_rmse": 1.5760322914255538,
+   "seconds": 5.6
   },
   {
    "group": "WI_3_FOODS",
    "series": 1437,
    "rows": 628141,
    "rounds": 37,
-   "valid_rmse": 2.5626421879190517,
-   "seconds": 6.9
+   "valid_rmse": 2.549677978785934,
+   "seconds": 8.4
   },
   {
    "group": "WI_3_HOBBIES",
    "series": 565,
    "rows": 247356,
-   "rounds": 55,
-   "valid_rmse": 1.2861286513679135,
-   "seconds": 2.7
+   "rounds": 22,
+   "valid_rmse": 1.2916193778205243,
+   "seconds": 3.0
   },
   {
    "group": "WI_3_HOUSEHOLD",
    "series": 1047,
    "rows": 454951,
-   "rounds": 27,
-   "valid_rmse": 1.1923444937809131,
-   "seconds": 4.3
+   "rounds": 42,
+   "valid_rmse": 1.2044344621022565,
+   "seconds": 5.6
   }
  ],
- "wrmsse": 0.6112547407901491,
- "mean_rmsse": 0.74250315198888,
+ "wrmsse": 0.630129705838377,
+ "mean_rmsse": 0.7429212907590497,
  "wrmsse_by_level": {
-  "all": 0.6112547407901491,
-  "1": 0.46554691674168586,
-  "2": 0.4963546048757652,
-  "3": 0.5339356752271082,
-  "4": 0.4917239226963126,
-  "5": 0.5720263725232155,
-  "6": 0.5312781434101037,
-  "7": 0.599840402140375,
-  "8": 0.5761495394244136,
-  "9": 0.6467529450233681,
-  "10": 0.796485784169183,
-  "11": 0.8097035944358733,
-  "12": 0.8152589888143847
+  "all": 0.630129705838377,
+  "1": 0.5191402834756644,
+  "2": 0.5403713838637942,
+  "3": 0.5739757555031795,
+  "4": 0.5457158510409742,
+  "8": 0.6097150029714328,
+  "10": 0.8042739216927104,
+  "12": 0.817715742320883
  }
 }

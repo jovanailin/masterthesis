@@ -23,6 +23,7 @@ valid_forecast_seed<k>.npy and model_test_seed<k>.ubj.
 Partially global models and the recursive strategy (run_extra) are described in the last part of the file.
 """
 import dataclasses
+import gc
 import json
 import shutil
 import time
@@ -243,8 +244,31 @@ def run(job: dict, work: Path) -> None:
     table = F.origin_table(panel, *F.training_origins(panel, "test"))
     for inputs, loss in variants:
         refit(panel, table, work / variant_name(inputs, loss), device)
-    for seed in seeds:
-        refit(panel, table, top, device, seed)
+    if job.get("seed_refits", True):  # False: the test models of the seeds are trained by run_seed_refits
+        for seed in seeds:
+            refit(panel, table, top, device, seed)
+            gc.collect()
+    _log(step="done", hours=round((time.perf_counter() - start) / 3600, 2))
+
+
+def run_seed_refits(job: dict, work: Path) -> None:
+    """Test models of extra seeds of an already tuned variant, in a kernel of their own.
+
+    {"refit_of": variant, "source_dir": folder of its best.json, "seeds": [...]}. Split off from the tuning
+    kernel when one kernel runs out of memory (as with L+E+S+ID+H, whose design matrix is the widest).
+    """
+    start = time.perf_counter()
+    source = Path(job["source_dir"])
+    top = work / source.name
+    top.mkdir(parents=True, exist_ok=True)
+    shutil.copy(source / "best.json", top / "best.json")
+    panel = F.build_panel()
+    if job.get("series_step"):  # quick check of the code on a subset of the series
+        panel = panel.subset(np.arange(0, len(panel.ids), job["series_step"]))
+    table = F.origin_table(panel, *F.training_origins(panel, "test"))
+    for seed in job["seeds"]:
+        refit(panel, table, top, job.get("device", "cuda"), seed)
+        gc.collect()
     _log(step="done", hours=round((time.perf_counter() - start) / 3600, 2))
 
 

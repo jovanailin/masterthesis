@@ -23,3 +23,14 @@ Thumbs.db
 
 # Local outputs of the Kaggle jobs (smoke tests)
 kaggle_jobs/*/out/
+
+# LaTeX build files
+thesis/*.aux
+thesis/*.bbl
+thesis/*.blg
+thesis/*.log
+thesis/*.out
+thesis/*.toc
+thesis/*.fls
+thesis/*.fdb_latexmk
+thesis/*.synctex.gz

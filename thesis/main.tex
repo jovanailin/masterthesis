@@ -1,0 +1,34 @@
+% Master's thesis. Build:  latexmk   (in this folder; writes main.pdf)
+\documentclass[12pt,a4paper,oneside]{report}
+\input{preamble}
+
+% ---- fill in -------------------------------------------------------------
+\newcommand{\thesistitle}{Global Gradient Boosting Models for Intermittent Retail Demand Forecasting}
+\newcommand{\thesisauthor}{Jovana Ilin}
+\newcommand{\thesismentor}{[mentor]}
+\newcommand{\thesisuniversity}{[university]}
+\newcommand{\thesisfaculty}{[faculty and study programme]}
+\newcommand{\thesisplace}{[place]}
+\newcommand{\thesisyear}{2026}
+% --------------------------------------------------------------------------
+
+\begin{document}
+\input{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+\input{chapters/01_introduction}
+\input{chapters/02_time_series}
+\input{chapters/03_gradient_boosting}
+\input{chapters/04_global_models}
+\input{chapters/05_evaluation}
+\input{chapters/06_data_and_setup}
+\input{chapters/07_results}
+\input{chapters/08_conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{literatura}
+\end{document}

@@ -1,0 +1,110 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+\section{Problem}
+\label{sec:problem}
+
+A retailer has to decide every day how much of each product to keep in each store. The decision rests on a
+forecast of demand: if the forecast is too low, the shelf is empty and the sale is lost; if it is too high,
+money is tied up in stock, and perishable goods are thrown away. The forecast is needed at the lowest level,
+one product in one store, because that is where replenishment takes place. Forecasts for a whole store, a
+product category or a region are needed as well, for purchasing, staffing and planning.
+
+At the lowest level, daily demand looks very different from the smooth, seasonal series of textbooks. Most
+products are not sold every day. Their sales are a sequence of zeros interrupted by small positive
+quantities, a pattern known as \emph{intermittent demand}. The data used in this thesis, the daily sales of
+3{,}049 products in ten Walmart stores published for the M5 forecasting competition
+\citep{makridakis2022background}, show how common this is: the typical series has no sale on about 60\% of
+the days since the product was introduced, and by the classification of \citet{syntetos2005categorization}
+about 91\% of the 30{,}490 series are intermittent or lumpy.
+
+Intermittent demand is hard to forecast for two reasons. The first is that one series carries very little
+information. Whether a product is sold on Tuesday or on Thursday is largely a matter of chance, so the
+recent history of a single series says little about its next days. The second is that the usual assumptions
+of time series models do not hold: the values are small counts with many zeros, not continuous and roughly
+normal quantities. Specialised methods were developed for this setting. \citet{croston1972} proposed to
+smooth the sizes of the demands and the intervals between them separately; later methods corrected the bias
+of this estimator \citep{syntetos2005accuracy}, let the forecast decay during long periods without sales
+\citep{teunter2011} or smoothed the demand after aggregating it in time \citep{nikolopoulos2011}. All of
+them forecast one series from its own history and produce a flat forecast, the expected demand per day.
+They are simple, fast and difficult to beat on single series, but they cannot use what is known in advance
+about the days to be forecast (the day of the week, a holiday, a price change), and they learn nothing from
+the thousands of other series sold in the same stores.
+
+A \emph{global} model takes the opposite approach: one model is trained on all series together
+\citep{januschowski2020,monteromanso2021}. What cannot be learnt from one sparse series, such as the weekly
+rhythm of a store or the effect of a promotion, can be learnt from thousands of them. Gradient boosted
+decision trees are the most successful family of such models for tabular data. In the M5 competition
+most of the leading solutions were global gradient boosting models, trained with a loss function suited
+to count data and with a rich set of input features \citep{makridakis2022accuracy}.
+
+That success leaves an open question, because the winning solutions changed several things at once: the
+model, the pooling of series, the loss function and the features. It is therefore not clear which of these
+choices is responsible for the gain, nor whether the gain exists for the sparse series themselves or only
+for the aggregated totals, on which the competition measure puts most of its weight. \citet{tsantilis2025}
+separated one of these choices. On 100 intermittent M5 series, and with past sales as the only input, they
+compared models trained for each series with models trained on all of them, for three architectures. Pooling
+helped the gradient boosting model, but the differences between all the models were small, no classical
+method was included for reference, and the authors left untested their hypothesis about what happens when
+other inputs are added.
+
+This thesis takes up that question on the complete data set. It studies one model family, gradient boosted
+trees as implemented in XGBoost \citep{chen2016}, and varies one design choice at a time: the inputs, the
+loss function, the level at which the series are pooled and the strategy for forecasting several days
+ahead. Every variant is compared with the classical methods for intermittent demand, both on single series
+and on the aggregated levels of the hierarchy.
+
+\section{Research Questions and Contributions}
+\label{sec:questions}
+
+The thesis answers the following questions.
+
+\begin{description}[leftmargin=1.5cm,style=nextline]
+\item[RQ1] Is a global gradient boosting model more accurate than the classical methods for intermittent
+  demand, and is the answer the same for single series as for the aggregated levels of the hierarchy?
+\item[RQ2] How much does pooling matter? How do one model per series, one model per store or per demand
+  class, and one model for all series compare?
+\item[RQ3] Which inputs carry the gain: past sales, inputs known in advance (calendar, events, SNAP days,
+  prices), statistics of the sales history, or the identity of the series?
+\item[RQ4] Does a loss function designed for count data (Poisson, Tweedie) improve on the squared error?
+\item[RQ5] Is it better to forecast each day ahead directly or to apply a one-day-ahead model recursively?
+\item[RQ6] Where do the classical methods still win, and what does the model actually use to form its
+  forecasts?
+\end{description}
+
+The contributions of the thesis are the following.
+
+\begin{itemize}
+\item A controlled comparison on all 30{,}490 series of the M5 data, in which the inputs, the loss, the
+  level of pooling and the forecasting strategy are varied one at a time, while the data, the tuning
+  procedure and the evaluation stay the same.
+\item An evaluation with two measures that answer different questions: the mean error of the single series,
+  most of which are intermittent, and a revenue-weighted error over seven levels of the hierarchy. The two
+  measures give different pictures, and the difference is one of the main findings.
+\item A comparison with strong classical methods, including versions whose smoothing constants are chosen
+  for each series, so that the gain of the global model is not measured against weak references only.
+\item An empirical test of the hypothesis of \citet{tsantilis2025} that additional inputs reduce the
+  difference between models per series and a global model.
+\item A check of the stability of the conclusions: the main models are retrained with several random seeds
+  and evaluated on three earlier periods in addition to the test period, which shows which differences are
+  reliable and which change sign from one period to another.
+\item An interpretation of the final model with Shapley values, which relates what the model uses to what
+  the classical methods use and explains where its advantage comes from.
+\end{itemize}
+
+\section{Outline}
+\label{sec:outline}
+
+Chapters~\ref{ch:timeseries} to~\ref{ch:evaluation} give the background. Chapter~\ref{ch:timeseries}
+introduces time series forecasting, intermittent demand and the classical methods used as references.
+Chapter~\ref{ch:boosting} describes gradient boosting, XGBoost, loss functions for data with many zeros and
+Shapley values. Chapter~\ref{ch:global} explains how forecasting becomes a supervised learning problem, the
+difference between local and global models, the input features and the strategies for forecasting several
+steps ahead. Chapter~\ref{ch:evaluation} presents the error measures and the statistical tests used to
+compare forecasts.
+
+Chapter~\ref{ch:setup} describes the data, the exploratory analysis and the experimental setup: the split
+into training, validation and test periods, the inputs, the reference methods and the tuning of the models.
+Chapter~\ref{ch:results} reports the results, one section for each research question, and discusses where
+the classical methods remain competitive. Chapter~\ref{ch:conclusion} answers the research questions, states
+the limitations of the work and suggests directions for further research.

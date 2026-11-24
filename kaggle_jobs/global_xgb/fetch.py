@@ -15,18 +15,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def main(job: str, download: bool = True) -> None:
+def main(job: str, download: bool = True, folder: str = "global_xgb", prefix: str = "m5-global-xgb") -> None:
+    """`folder`: folder in data/processed/ and results/ (weekly_xgb for kaggle_jobs/weekly_xgb/fetch.py)."""
     user = json.loads((Path.home() / ".kaggle" / "kaggle.json").read_text())["username"]
-    out = ROOT / "data" / "processed" / "global_xgb" / job
+    out = ROOT / "data" / "processed" / folder / job
     if download:
         shutil.rmtree(out, ignore_errors=True)
         out.mkdir(parents=True)
-        kernel = f"{user}/m5-global-xgb-{job.replace('_', '-')}"
+        kernel = f"{user}/{prefix}-{job.replace('_', '-')}"
         run = subprocess.run([sys.executable, "-m", "kaggle", "kernels", "output", kernel, "-p", str(out)],
                              capture_output=True, text=True)
         assert run.returncode == 0, run.stderr[-2000:]
     for best in sorted(out.glob("*/best.json")):
-        target = ROOT / "results" / "global_xgb" / best.parent.name
+        target = ROOT / "results" / folder / best.parent.name
         target.mkdir(parents=True, exist_ok=True)
         for name in ["best.json", "trials.json", "seeds.json"]:
             if (best.parent / name).exists():

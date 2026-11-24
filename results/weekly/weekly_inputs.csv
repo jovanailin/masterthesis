@@ -1,0 +1,50 @@
+feature,group,description
+h,h,horizon: weeks from the origin week t to the target week
+lag_1,L,sales in week t - 0
+lag_2,L,sales in week t - 1
+lag_3,L,sales in week t - 2
+lag_4,L,sales in week t - 3
+lag_5,L,sales in week t - 4
+lag_6,L,sales in week t - 5
+lag_7,L,sales in week t - 6
+lag_8,L,sales in week t - 7
+lag_9,L,sales in week t - 8
+lag_10,L,sales in week t - 9
+lag_11,L,sales in week t - 10
+lag_12,L,sales in week t - 11
+lag_13,L,sales in week t - 12
+lag_year,L,sales in the target week 52 weeks earlier (week t + h - 52)
+week_of_year,E,ISO week of the year of the target week (1..53)
+month,E,month of the Thursday of the target week
+n_event_days,E,days of the target week with an event (0..7)
+event,E,"first event of the target week (30 named events, categorical; none = no event)"
+event_type,E,"type of that event: Cultural, National, Religious, Sporting (categorical)"
+days_to_event,E,days from the Sunday of the target week to the next event after it
+days_since_event,E,days from the last event before the target week to its Monday
+snap_days,E,SNAP days of the target week in the store's state (0..7)
+rel_price,E,price in the target week / the series' median price in the training weeks
+price_change,E,price in the target week / price in the previous week - 1
+discount,E,1 - price in the target week / highest price of the last 52 weeks
+mean_4,S,mean weekly sales over the last 4 weeks
+mean_13,S,mean weekly sales over the last 13 weeks
+mean_26,S,mean weekly sales over the last 26 weeks
+mean_52,S,mean weekly sales over the last 52 weeks
+zero_share_13,S,share of weeks without sales over the last 13 weeks
+zero_share_52,S,share of weeks without sales over the last 52 weeks
+nz_mean_13,S,mean sales of the weeks with sales over the last 13 weeks
+weeks_since_sale,S,weeks since the last week with sales (0 = sales in week t)
+age,S,weeks since the first full week of the series (1 = week t)
+item_id,ID,"item (3,049, categorical)"
+dept_id,ID,"department (7, categorical)"
+cat_id,ID,"category (3, categorical)"
+store_id,ID,"store (10, categorical)"
+state_id,ID,"state (3, categorical)"
+item_all_mean_1,H,mean weekly sales of the item in all stores over the last 1 week
+item_all_mean_4,H,mean weekly sales of the item in all stores over the last 4 weeks
+item_all_trend,H,item_all_mean_1 / item_all_mean_4
+dept_store_mean_1,H,mean weekly sales of the department in the store over the last 1 week
+dept_store_mean_4,H,mean weekly sales of the department in the store over the last 4 weeks
+dept_store_trend,H,dept_store_mean_1 / dept_store_mean_4
+store_mean_1,H,mean weekly sales of the whole store over the last 1 week
+store_mean_4,H,mean weekly sales of the whole store over the last 4 weeks
+store_trend,H,store_mean_1 / store_mean_4

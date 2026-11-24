@@ -21,16 +21,18 @@ KERNEL_SOURCES = {"final": ["m5-global-xgb-tweedie"], "extra": ["m5-global-xgb-t
                   "hier_seeds34": ["m5-global-xgb-hier"]}  # earlier kernels whose outputs the job reads
 
 
-def main(job: str) -> None:
+def main(job: str, here: Path = HERE, prefix: str = "m5-global-xgb", sources: dict = KERNEL_SOURCES,
+         gpu: bool = True) -> None:
+    """Push job.py of the folder `here` (kaggle_jobs/weekly_xgb/push.py calls this with its own folder)."""
     user = json.loads((Path.home() / ".kaggle" / "kaggle.json").read_text())["username"]
-    code = (HERE / "job.py").read_text(encoding="utf-8")
+    code = (here / "job.py").read_text(encoding="utf-8")
     assert code.count('"@JOB@"') == 1 and f'"{job}":' in code, f"unknown job {job}"
-    slug = f"m5-global-xgb-{job.replace('_', '-')}"
+    slug = f"{prefix}-{job.replace('_', '-')}"
     meta = {"id": f"{user}/{slug}", "title": slug, "code_file": "job.py", "language": "python",
-            "kernel_type": "script", "is_private": "true", "enable_gpu": "true", "enable_tpu": "false",
+            "kernel_type": "script", "is_private": "true", "enable_gpu": str(gpu).lower(), "enable_tpu": "false",
             "enable_internet": "true", "machine_shape": "", "dataset_sources": [f"{user}/m5-thesis-src"],
             "competition_sources": ["m5-forecasting-accuracy"],
-            "kernel_sources": [f"{user}/{k}" for k in KERNEL_SOURCES.get(job, [])], "model_sources": []}
+            "kernel_sources": [f"{user}/{k}" for k in sources.get(job, [])], "model_sources": []}
     with tempfile.TemporaryDirectory() as tmp:
         (Path(tmp) / "job.py").write_text(code.replace('"@JOB@"', f'"{job}"'), encoding="utf-8", newline="\n")
         (Path(tmp) / "kernel-metadata.json").write_text(json.dumps(meta, indent=1))

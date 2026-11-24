@@ -115,13 +115,16 @@ def _log(**info) -> None:
 
 
 def tune(panel, table, val: ForecastRows, ev: M.Evaluator, inputs: str, loss: str, out: Path, *, max_evals: int,
-         timeout: float, device: str, max_rounds: int = MAX_ROUNDS, patience: int = PATIENCE, seed: int = 0) -> dict:
-    """Hyperopt search of one variant; returns (and saves) the best trial."""
+         timeout: float, device: str, max_rounds: int = MAX_ROUNDS, patience: int = PATIENCE, seed: int = 0,
+         make_train=None) -> dict:
+    """Hyperopt search of one variant; returns (and saves) the best trial.
+
+    `make_train` builds the training matrix (default: training_matrix; weekly_xgb.py passes its own)."""
     out.mkdir(parents=True, exist_ok=True)
     groups = INPUT_SETS[inputs]
     name = variant_name(inputs, loss)
     t = time.perf_counter()
-    dtrain = training_matrix(panel, table, groups, "valid", seed)
+    dtrain = (make_train or training_matrix)(panel, table, groups, "valid", seed)
     dval = xgb.QuantileDMatrix(val.inputs(groups), val.y, ref=dtrain, enable_categorical=True)
     _log(variant=name, step="matrices", rows=dtrain.num_row(), columns=dtrain.num_col(),
          seconds=round(time.perf_counter() - t, 1))
@@ -164,7 +167,7 @@ def tune(panel, table, val: ForecastRows, ev: M.Evaluator, inputs: str, loss: st
     return best
 
 
-def refit(panel, table, out: Path, device: str, seed: int | None = None) -> None:
+def refit(panel, table, out: Path, device: str, seed: int | None = None, make_train=None) -> None:
     """Refit the best trial of a variant on targets up to d_1941; with `seed`, as an extra run of that seed."""
     best = json.loads((out / "best.json").read_text())
     params = best["params"] | {"device": device}
@@ -172,7 +175,7 @@ def refit(panel, table, out: Path, device: str, seed: int | None = None) -> None
     if seed is not None:
         params["seed"], file = seed, f"model_test_seed{seed}.ubj"
     t = time.perf_counter()
-    dtrain = training_matrix(panel, table, INPUT_SETS[best["inputs"]], "test", params["seed"])
+    dtrain = (make_train or training_matrix)(panel, table, INPUT_SETS[best["inputs"]], "test", params["seed"])
     bst = xgb.train(params, dtrain, best["rounds"])
     bst.save_model(out / file)
     _log(variant=best["variant"], step="refit", file=file, rows=dtrain.num_row(), rounds=best["rounds"],
